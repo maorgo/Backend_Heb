@@ -20,7 +20,7 @@ session = DBSession()
 def index():
     p = Post(author='Maor', image_location='Location', image_caption='Caption', title='Title', lead='Lead',
              date=sqlalchemy.DATE, text='Text', primary_tag='Primary_Tag', secondary_tag='second')
-    #author, image_location, image_caption, title, lead, date, text, primary_tag, secondary_tag
+    # #author, image_location, image_caption, title, lead, date, text, primary_tag, secondary_tag
     #session.add(p)
     #print session.query(Post).all().pop()
     #session.query(Post)
