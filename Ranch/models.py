@@ -9,28 +9,26 @@ class Post(db.Model):
     Image_Caption = db.Column(db.String(64))
     Title = db.Column(db.String(120), unique=True, primary_key=True)
     Lead = db.Column(db.String(512))
-    Date = db.Column(db.Date)
-    Text = db.Column(db.Text())
+    Date = db.Column(db.DateTime)
+    Text = db.Column(db.String(512))
     Primary_Tag = db.Column(db.String(256))
     Secondary_Tag = db.Column(db.String(256))
     Views = db.Column(db.Integer)
 
+    def __init__(self, author, image_location, image_caption, title, lead, date, text, primary_tag, secondary_tag):
+        self.Author = author
+        self.Image_Location = image_location
+        self.image_Caption = image_caption
+        self.Title = title
+        self.Lead = lead
+        self.Date = date
+        self.Text = text
+        self.Primary_Tag = primary_tag
+        self.Secondary_Tag = secondary_tag
+        self.Views = 0
 
-def __init__(self, author, image_location, image_caption, title, lead, date, text, primary_tag, secondary_tag):
-    self.Author = author
-    self.image_location = image_location
-    self.image_caption = image_caption
-    self.title = title
-    self.lead = lead
-    self.date = date
-    self.text = text
-    self.primary_tag = primary_tag
-    self.secondary_tag = secondary_tag
-    self.views = 0
-
-
-def __repr__(self):
-    return '<Post Title {0}>'.format(self.title)
+    def __repr__(self):
+        return '<Post Title {0}>'.format(self.Title)
 
 
 class Comments(db.Model):
@@ -42,11 +40,11 @@ class Comments(db.Model):
     CommentTo = db.Column(db.String(64))
 
 
-class Test(db.Model):
-    __tablename__ = 'test'
-    col = db.Column(db.Integer, primary_key=True)
+class Tag(db.Model):
+    __tablename__ = 'tag'
+    tag = db.Column(db.String(128), primary_key=True)
 
-    def __init__(self, col):
-        self.col = col
+    def __init__(self, tag):
+        self.tag = tag
 
 

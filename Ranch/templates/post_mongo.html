@@ -1,29 +1,29 @@
 {% extends 'layout.html' %}
 {% block header %}
-<h1> {{ post.Title }} </h1>
-{% if post.Primary_Tag == 'System Messages' %}
-	<p>פורסם ע"י <span class="glyphicon glyphicon-user"></span> <a href="/about"> {{ post.Author }} </a> בתאריך <span class="glyphicon glyphicon-time"></span> {{ post.Date }} &nbsp;<img src="/static/pictures/tag.png" height="20" width="20">&nbsp; בנושא {{ post.Primary_Tag}}</p>
+<h1>{{ post['title'] }} </h1>
+{% if post['primary_tag'] == 'System Messages' %}
+	<p>פורסם ע"י <span class="glyphicon glyphicon-user"></span> <a href="/about">{{ post['author'] }}</a> בתאריך <span class="glyphicon glyphicon-time"></span> {{ post['date'].strftime('%Y-%m-%d') }} &nbsp;<img src="/static/pictures/tag.png" height="20" width="20">&nbsp;בנושא {{post['primary_tag']}}</p>
 {% else %}
-	<p>פורסם ע"י <span class="glyphicon glyphicon-user"></span> <a href="/about"> {{ post.Author }}</a> בתאריך <span class="glyphicon glyphicon-time"></span> {{ post.Date }} &nbsp;<img src="/static/pictures/tag.png" height="20" width="20">&nbsp;בנושא <a href="/{{post.Primary_Tag}}">{{post.Primary_Tag}}</a></p>
+	<p>פורסם ע"י <span class="glyphicon glyphicon-user"></span> <a href="/about">{{ post['author'] }}</a> בתאריך <span class="glyphicon glyphicon-time"></span> {{ post['date'].strftime('%Y-%m-%d') }} &nbsp;<img src="/static/pictures/tag.png" height="20" width="20">&nbsp;בנושא <a href="/{{post['primary_tag']}}">{{post['primary_tag']}}</a></p>
 {% endif %}
 {% endblock %}
 
 {% block middle_area %}
 					<figure class="margin-b-2">
-						<img class="img-responsive" src="post.Image_Location" alt="">
-						<b>post.Image_Location</b>
-						<figcaption class="margin-t-h">post.Image_Caption</figcaption>
+						<img class="img-responsive" src="{{ post['img_location'] }}" alt="">
+						<b>{{ post['image_location'] }}</b>
+						<figcaption class="margin-t-h">{{ post['img_caption'] }}</figcaption>
 					</figure>
 
-					<p class="lead"><h4>post.Lead </h4></p><hr>
-					<p> post.Text </p>
+					<p class="lead"><h4>{{ post['lead']|safe }} </h4></p><hr>
+					<p> {{ post['text']|safe }} </p>
 					<hr>
 
 					<!-- Comment form -->
 					<h3>השאר תגובה</h3>
 					<p>אנא הגב בנעימות וסבלנות לקוראים אחרים. תודה.</p>
 					<div class="well">
-						<form action="{{ url_for('add_comment',title=post.Title) }}" method="post">
+						<form action="{{ url_for('add_comment',title=post['title']) }}" method="post">
 							<div class="form-group">
 								<label for="contactName">שם</label>
 								<input type="text" class="form-control" id="contactName" placeholder="הכנס את שמך" name="contactName">
@@ -62,12 +62,12 @@
 									<p>{{ comment['comment_date'] }}</p>
 									<p>{{ comment['comment'] }}</p>
 									<p>
-										<a href="{{ url_for('upvote', comment_id=comment['id'], title=post.Title) }}" style="text-decoration:none">
+										<a href="{{ url_for('upvote', comment_id=comment['id'], title=post['title']) }}" style="text-decoration:none">
 											<button class="btn btn-sm btn-default">
 												<span class="glyphicon glyphicon-thumbs-up"></span> הצבע למעלה
 											</button>
 										</a>
-										<a href="{{ url_for('downvote', comment_id=comment['id'], title=post.Title) }}" style="text-decoration:none">
+										<a href="{{ url_for('downvote', comment_id=comment['id'], title=post['title']) }}" style="text-decoration:none">
 											<button class="btn btn-sm btn-default">
 												<span class="glyphicon glyphicon-thumbs-down"></span> הצבע למטה
 											</button>

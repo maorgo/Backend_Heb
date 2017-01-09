@@ -1,3 +1,4 @@
+from time import strftime, gmtime
 import os
 import smtplib
 import uuid
@@ -18,18 +19,28 @@ session = DBSession()
 
 @app.route('/')
 def index():
-    p = Post(author='Maor', image_location='Location', image_caption='Caption', title='Title', lead='Lead',
-             date=sqlalchemy.DATE, text='Text', primary_tag='Primary_Tag', secondary_tag='second')
-    # #author, image_location, image_caption, title, lead, date, text, primary_tag, secondary_tag
-    #session.add(p)
-    #print session.query(Post).all().pop()
-    #session.query(Post)
+    # p = Post(author='Maor2', image_location='Location5', image_caption='Caption2', title='Title5', lead='Lead2',
+    #          date=strftime("%Y-%m-%d %H:%M:%S", gmtime()), text='Text2', primary_tag='Primary_Tag2', secondary_tag='second2')
+    # session.add(p)
+    # print '1'
+    # try:
+    #     session.commit()
+    # except Exception, e:
+    #     print str(e)
+    # print 'ok'
+    # try:
+    #     print session.query(Post).all()
+    # except Exception, e:
+    #     print e
+    last_post = session.query(Post).filter(Post.Primary_Tag != 'System Messages').\
+        order_by(sqlalchemy.desc(Post.Date)).limit(1).first()
+    return render_template('post.html', post=last_post)
     last_post = posts_collection.find({'primary_tag': {'$ne': 'System Messages'}}).sort('date', -1).limit(1)
     if last_post.count() < 1:
         return render_template('oops.html', tags=methods.tags, last_posts=methods.last_posts(),
                                top_posts=methods.top_posts())
     last_post = last_post[0]
-    return render_template('post.html', post=last_post, tags=methods.tags, newer_older=True,
+    return render_template('post_mongo.html', post=last_post, tags=methods.tags, newer_older=True,
                            top_posts=methods.top_posts(), last_posts=methods.last_posts())
 
 
@@ -48,7 +59,7 @@ def about():
     if about_post.count() != 1:
         return render_template('oops.html', reason='No such post found')
     about_post = about_post[0]
-    return render_template('post.html', post=about_post, tags=methods.tags, last_posts=methods.last_posts(),
+    return render_template('post_mongo.html', post=about_post, tags=methods.tags, last_posts=methods.last_posts(),
                            top_posts=methods.top_posts())
 
 
@@ -56,7 +67,7 @@ def about():
 def contact():
     # Placeholder. Should work on it.
     # contact_me = posts_collection.find({'title': 'Contact Me'}).limit(1)[0]
-    # return render_template('post.html',post=contact_me, last_posts=methods.last_posts(),
+    # return render_template('post_mongo.html',post=contact_me, last_posts=methods.last_posts(),
     # top_posts=methods.top_posts(), tags=methods.tags)
     return render_template('contact.html', post='', last_posts=methods.last_posts(), top_posts=methods.top_posts(),
                            tags=methods.tags)
@@ -82,7 +93,7 @@ def post(title):
     blog_post = blog_post[0]
 
     posts_collection.update({'title': blog_post['title']}, {'$set': {'views': blog_post['views'] + 1}})
-    return render_template('post.html', post=blog_post, top_posts=methods.top_posts(), last_posts=methods.last_posts(),
+    return render_template('post_mongo.html', post=blog_post, top_posts=methods.top_posts(), last_posts=methods.last_posts(),
                            newer_older=True, tags=methods.tags)
 
 
