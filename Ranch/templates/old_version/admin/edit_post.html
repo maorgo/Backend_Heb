@@ -1,0 +1,56 @@
+{% extends "base_layout.html" %}
+{% block base_content %}
+<center>{{ message|safe }}</center>
+    <table id="posttable" width="70%" align="center" cellpadding="14">
+        <tr>
+            <td id="backgroundtd">
+                <h1>Edit a Post </h1>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table border="0" cellpadding="14">
+                    <form action="edit_post" method="POST">
+                    <tr>
+                        <td>
+                            New Post's title:
+                        </td>
+                        <td>
+                            <input type="text" size="149" name="old_title" value="{{ post['title'] }}" hidden>
+                            <input type="text" size="149" name="title" value="{{ post['title'] }}">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top">
+                        </td>
+                        <td>
+                            <textarea class="edit" cols="150" rows="35" name="post">{{ post['text'] }} </textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Post's tags:
+                        </td>
+                        <td>
+                            {% for tag in tags['tags'] %}
+                                {% if tag in post['tags'] %}
+                                    <label>
+                                        <input type="checkbox" name="{{ tag }}" checked> {{ tag }}
+                                    </label>
+                                {% else %}
+                                    <label>
+                                        <input type="checkbox" name="{{ tag }}"> {{ tag }}
+                                    </label>
+                                {% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> <input type="submit" value="Post it!"> </td>
+                    </tr>
+                </form>
+                </table>
+            </td>
+        </tr>
+    </table>
+{% endblock %}

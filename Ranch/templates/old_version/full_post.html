@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+{% block content %}
+    <table id="posttable" width="70%" align="center" cellpadding="14">
+        <tr>
+            <td id="backgroundtd"><h1>&nbsp;{{ post['title'] }} </h1></td>
+            <td align="right" id="backgroundtd" width="15%"> <h1> {{ post['date'] }}&nbsp;</h1></td>
+        </tr>
+        <tr>
+            <td>
+                {{ post['text']|safe}}
+                <br><br>
+                <hr width="1100" align="left">
+            </td>
+        </tr>
+        <tr>
+            <td align="left" valign="bottom" >
+                <b> tags: &nbsp;</b>
+                {% for tag in post['tags'] %}
+                    <a class='post' href="/{{ tag.strip() }}" id="post_link"> {{ tag }}</a> &nbsp;
+                {% endfor %}
+            </td>
+        </tr>
+        <tr><td>
+            <hr width="1100" align="left">
+                <table border="0">
+                    <form action="/posts/{{ post['title'] }}/comment" method="post">
+                    <tr>
+                        <td>
+                            Name:
+                        </td>
+                        <td>
+                            <input type="text" size="48" name="name">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Comment:
+                        </td>
+                        <td>
+                            <textarea rows="7" cols="49" name="comment"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> <input type="submit" value="submit"> </td>
+                        </form>
+                    </tr>
+                </table><br>
+            {% if post['comments'] is defined %}
+                {% for comment in post['comments'] %}
+                    <b> {{ comment['post_id'] }} <br>
+                        {{ comment['author'] }} said at {{ comment['comment_date'] }}: </b><br>
+                    <br>{{ comment['comment'] }}
+                    <table border="0" align="right">
+                        <tr align="right">
+                            <td align="right" width="100">
+                                <b>votes: </b>{{ comment['upvotes'] }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td align="left">
+                                <a class='post' href={{ url_for('upvote', title=post['title'], comment_id=comment['id']) }}>
+                                    <b>Up vote&nbsp;</b>
+                                </a>
+                            </td>
+                            <td>
+                                <a class='post' href={{ url_for('downvote', title=post['title'], comment_id=comment['id']) }}>
+                                    <b>Down vote</b>
+                                </a>
+                            </td>
+                        </tr>
+                    </table><br><br>
+                    <br><hr>
+                {% endfor %}
+            {% else %}
+                <i>No comments on this post. Be the first one to comment.</i>
+            {% endif %}
+        </td></tr>
+        </table>
+
+    <br> <br>
+{% endblock %}

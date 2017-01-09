@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% if posts is none %}
+        <table id="posttable" width="70%" align="center" cellpadding="14">
+        <tr>
+            <td id="backgroundtd"> <h1>Oops! </h1></td>
+            <td align="right" id="backgroundtd"> <h1>{{ now }}</h1></td>
+        </tr>
+        <tr>
+            <td><font size="4">
+                No posts regarding {{ topic }} were found. Sorry about that.
+            </font></td>
+        </tr>
+        </table>
+    {% else %}
+        {% for post in posts %}
+        <table id="posttable" width="70%" align="center" cellpadding="14">
+            <tr>
+                <td id="backgroundtd"> <a href="/posts/{{ post['title'] }}" id="title-link"> <h1> {{ post['title'] }} </h1></a></td>
+                <td align="right" id="backgroundtd" width="15%"> <h1>{{ post['date'] }}</h1></td>
+            </tr>
+            <tr>
+                <td>
+                    {{ post['text'][:350]|safe}}....
+                    <br> <br> <br>
+                    <a href="/posts/{{ post['title'] }}" id="post_link"> <b>Click here for more</b> </a>
+                </td>
+                <td align="right" valign="bottom">
+                    <b> tags: </b>
+                    {% for tag in post['tags'] %}
+                        <a href="/{{ tag.strip() }}" id="post_link"> {{ tag }} </a>
+                    {% endfor %}
+                </td>
+            </tr>
+            </table>
+        <br> <br>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

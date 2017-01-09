@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+{% block header %}
+<h1>הרשם לעדכונים</h1>
+{% endblock %}
+
+{% block middle_area %}
+<form action="{{ url_for('subscribe')}}" method="post">
+
+<div class='well'>
+    <div class='form-group'>
+        <label for='email'>דוא"ל</label>
+        <input type='SEARCH' class='form-control' id='email' name='email' placeholder='הכנס דוא"ל להרשם'>
+    </div>
+    <button type='submit' class="btn btn-default">הרשם</button>
+    <div align="center">
+        {% if message is defined %}
+            <h4><font color="red"> {{ message }} </font></h4>
+        {% elif success_message is defined %}
+        <h4><font color="green"> {{ success_message }} </font></h4>
+        {% endif %}
+    </div>
+</div>
+
+</form>
+
+{% endblock %}

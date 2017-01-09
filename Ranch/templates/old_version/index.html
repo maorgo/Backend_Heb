@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% for post in posts_cursor %}
+        <table id="posttable" width="70%" align="center" cellpadding="14">
+            <tr>
+                <td id="backgroundtd"> <a href="/posts/{{ post['title'] }}" id="title-link"> <h1> &nbsp;{{ post['title'] }} </h1></a></td>
+                <td align="right" id="backgroundtd" width="15%"> <h1>{{ post['date'] }}&nbsp;</h1> </td>
+            </tr>
+            <tr>
+                <td>
+                    {{ post['text'][:350]|safe}}....
+                    <br> <br> <br>
+                    <a href="/posts/{{ post['title'] }}" id="post_link"> <b>Click here for more</b> </a>
+                </td>
+                <td align="right" valign="bottom">
+                    <b> tags: </b>
+                    {% for tag in post['tags'] %}
+                        <a href="/{{ tag.strip() }}" id="post_link"> {{ tag }} </a>
+                    {% endfor %}
+                </td>
+            </tr>
+            </table>
+        <br> <br>
+    {% endfor %}
+{% endblock %}

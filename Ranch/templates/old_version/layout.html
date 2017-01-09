@@ -1,0 +1,22 @@
+{% extends "base_layout.html" %}
+{% block base_content %}
+    <table align="center" border="1">
+        <table id="posttable" align="right" width="20%" cellpadding="14">
+            <tr><td id="backgroundtd"><h1>Categories</h1></td></tr>
+            {% for tag in category_tags %}
+                <tr><td> <a class="system" href="/{{ tag.strip() }}" id="post_link"> {{ tag }}: {{ category_tags[tag] }} </a>  </td></tr>
+            {% endfor %}
+            {{ aut }}
+            <tr><td></td></tr>
+
+            <tr><td id="backgroundtd"><h1>&nbsp;About Me</h1></td></tr>
+            <tr><td>My name is Maor Goaz.<br>I've started developing in Python at around 2013, pretty much at the time
+                    I found out how backend development can be pretty cool and interesting.<br>
+                    I mostly like to try out new technologies, POC them by myself and play with the results.
+            </td></tr>
+
+        </table>
+    </table>
+    {% block content %}
+    {% endblock %}
+{% endblock %}

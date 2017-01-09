@@ -1,0 +1,84 @@
+{% extends 'layout.html' %}
+{% block header %}
+<h1>{{ post['title'] }} </h1>
+{% if post['primary_tag'] == 'System Messages' %}
+	<p>פורסם ע"י <span class="glyphicon glyphicon-user"></span> <a href="/about">{{ post['author'] }}</a> בתאריך <span class="glyphicon glyphicon-time"></span> {{ post['date'].strftime('%Y-%m-%d') }} &nbsp;<img src="/static/pictures/tag.png" height="20" width="20">&nbsp;בנושא {{post['primary_tag']}}</p>
+{% else %}
+	<p>פורסם ע"י <span class="glyphicon glyphicon-user"></span> <a href="/about">{{ post['author'] }}</a> בתאריך <span class="glyphicon glyphicon-time"></span> {{ post['date'].strftime('%Y-%m-%d') }} &nbsp;<img src="/static/pictures/tag.png" height="20" width="20">&nbsp;בנושא <a href="/{{post['primary_tag']}}">{{post['primary_tag']}}</a></p>
+{% endif %}
+{% endblock %}
+
+{% block middle_area %}
+					<figure class="margin-b-2">
+						<img class="img-responsive" src="{{ post['img_location'] }}" alt="">
+						<b>{{ post['image_location'] }}</b>
+						<figcaption class="margin-t-h">{{ post['img_caption'] }}</figcaption>
+					</figure>
+
+					<p class="lead"><h4>{{ post['lead']|safe }} </h4></p><hr>
+					<p> {{ post['text']|safe }} </p>
+					<hr>
+
+					<!-- Comment form -->
+					<h3>השאר תגובה</h3>
+					<p>אנא הגב בנעימות וסבלנות לקוראים אחרים. תודה.</p>
+					<div class="well">
+						<form action="{{ url_for('add_comment',title=post['title']) }}" method="post">
+							<div class="form-group">
+								<label for="contactName">שם</label>
+								<input type="text" class="form-control" id="contactName" placeholder="הכנס את שמך" name="contactName">
+							</div>
+							<div class="form-group">
+								<label for="contactEmail">דוא"ל</label>
+								<input type="email" class="form-control" id="contactEmail" placeholder="הכנס כתובת דואר אלקטרוני" name="contactEmail">
+								<p class="help-block">נא ודא כי כתובת הדוא"ל נכונה.</p>
+							</div>
+							<div class="form-group">
+								<label for="contactComment">תגובה</label>
+								<textarea class="form-control" id="contactComment" name="contactComment"></textarea>
+							</div>
+							<button type="submit" class="btn btn-default">שלח</button>
+						</form>
+					</div>
+					<hr>
+					<!-- Comments -->
+					<h3>{{ post['comments'] |length }} תגובות</h3>
+					{% if post['comments'] | length == 0 %}
+						לא פורסמו עדיין תגובות. <b>היה הראשון לפרסם כאן תגובה!</b>
+					{% endif %}
+					{% for comment in post['comments'] %}
+						<div class="well">
+							<div class="media">
+								<div class="media-left">
+									<!-- <img src="http://placehold.it/70x70" alt=""> -->
+									<h1>{{ comment['upvotes'] }}</h1>
+								</div>
+								<div class="media-left">
+									<!-- <img src="http://placehold.it/70x70" alt=""> -->
+
+								</div>
+								<div class="media-body">
+									<h4 class="margin-t-0">{{ comment['author'] }}</h4>
+									<p>{{ comment['comment_date'] }}</p>
+									<p>{{ comment['comment'] }}</p>
+									<p>
+										<a href="{{ url_for('upvote', comment_id=comment['id'], title=post['title']) }}" style="text-decoration:none">
+											<button class="btn btn-sm btn-default">
+												<span class="glyphicon glyphicon-thumbs-up"></span> הצבע למעלה
+											</button>
+										</a>
+										<a href="{{ url_for('downvote', comment_id=comment['id'], title=post['title']) }}" style="text-decoration:none">
+											<button class="btn btn-sm btn-default">
+												<span class="glyphicon glyphicon-thumbs-down"></span> הצבע למטה
+											</button>
+											</a>
+										<button class="btn btn-sm btn-default">
+											<span class="glyphicon glyphicon-comment"></span> הגב
+										</button>
+									</p>
+								</div>
+							</div>
+						</div>
+					{% endfor %}
+
+{% endblock %}

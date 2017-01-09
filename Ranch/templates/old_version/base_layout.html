@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> Backend Heaven </title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    </head>
+    <body>
+        <table>
+            <table id='logotable' cellpadding="6" cellspacing="0" width="100%" border="0" align="right">
+                <tr>
+                    <td align="left" width="25%"> <h2> <a class="system" href="/">BackendHeaven.dom </a></h2> </td>
+                    <td align="center" width="10%"> <h2> <a class="system" href="/posts">Subjects </a></h2></td>
+                    <td align="center" width="15%"> <h2> <a class="system" href="/about">About This Blog</a></h2></td>
+                    <td align="center" width="12%"> <h2> <a class="system" href="/contact">Contact Me</a></h2></td>
+                    <!--<td align="center" width="13%"> <h2> <a class="system" href="/admin">Admin Page</a></h2></td>-->
+                    <td align="right">
+                        <font color="#878787" size="3">
+                            <input type="text" size="20" value="Search this blog"><input type="submit" value="search">
+                        </font>
+                    </td>
+                    <td align="right" width="11%">
+                        <a href="https://www.facebook.com/maor.goaz"> <img src="/static/facebook.png"> </a>
+                        <a href="https://plus.google.com/+MaorGoaz/"> <img src="/static/googleplus.png"></a>
+                        <a href="https://il.linkedin.com/in/maor-goaz-3241b299"> <img src="/static/linkedin.png"> </a>
+                    </td>
+
+                </tr>
+            </table>
+            <br> <br> <br> <br> <br>
+                {% block base_content %}
+                {% endblock %}
+            </table>
+        </table>
+    </body>
+
+</html>

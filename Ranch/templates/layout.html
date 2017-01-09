@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<title>BackendRanch</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="Description" lang="en" content="Backend Blog">
+		<meta name="author" content="Maor Goaz">
+		<meta name="robots" content="index, follow">
+
+		<!-- icons -->
+		<link rel="apple-touch-icon" href="/static/assets/img/apple-touch-icon.png">
+		<link rel="shortcut icon" href="favicon.ico">
+
+		<!-- Bootstrap Core CSS file -->
+		<link rel="stylesheet" href="/static/assets/css/bootstrap.min.css">
+
+		<!-- Override CSS file - add your own CSS rules -->
+		<link rel="stylesheet" href="/static/assets/css/styles.css">
+
+		<!-- Conditional comment containing JS files for IE6 - 8 -->
+		<!--[if lt IE 9]>
+			<script src="/static/assets/js/html5.js"></script>
+			<script src="/static/assets/js/respond.min.js"></script>
+		<![endif]-->
+	</head>
+	<body>
+
+		<!-- Navigation -->
+	    <nav class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+			<div class="container-fluid">
+
+				<!-- Brand and toggle get grouped for better mobile display -->
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<a class="navbar-brand" href="{{ url_for('index') }}">BackendRanch</a>
+				</div>
+				<!-- /.navbar-header -->
+
+				<!-- Collect the nav links, forms, and other content for toggling -->
+				<table width="88%">
+					<tr>
+						<td>
+							<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+								<ul class="nav navbar-nav">
+									<li><a href="{{ url_for('contact') }}">צור קשר</a></li>
+									<li><a href="{{ url_for('subscribe') }}">הרשם לעדכונים</a></li>
+									<li><a href="{{ url_for('about') }}">אודות הבלוג</a></li>
+									<li><a href="{{ url_for('archive') }}">ארכיון</a></li>
+								</ul>
+							</div>
+						</td>
+					</tr>
+				</table>
+				<!-- /.navbar-collapse -->
+			</div>
+			<!-- /.container-fluid -->
+		</nav>
+		<!-- /.navbar -->
+
+		<!-- Page Content -->
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-sm-8 col-sm-push-4">
+					<div class="page-header">
+						{% block header %}
+						{% endblock %}
+					</div>
+				</div>
+			</div>
+			<!-- /.row -->
+
+			<div class="row">
+				<div class="col-sm-8 col-sm-push-4">
+					{% if newer_older %}
+					<nav>
+						<ul class="pager">
+							<li class="previous"><a href="{{ url_for('newer', post_title=post['title']) }}"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> חדש יותר</a></li>
+							<li class="next"><a href="{{ url_for('older', post_title=post['title']) }}"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> ישן יותר </a></li>
+						</ul>
+					</nav>
+					{% endif %}
+					{% block middle_area %}
+					{% endblock %}
+
+					<!-- Pager -->
+					{% if newer_older %}
+					<nav>
+						<ul class="pager">
+							<li class="previous"><a href="{{ url_for('newer', post_title=post['title']) }}"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> חדש יותר</a></li>
+							<li class="next"><a href="{{ url_for('older', post_title=post['title']) }}"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> ישן יותר </a></li>
+						</ul>
+					</nav>
+					{% endif %}
+
+				</div>
+				<div class="col-sm-4 col-sm-pull-8">
+					<!-- Search -->
+					<div class="well">
+						<h4 class="margin-t-0">חיפוש</h4>
+						<form action="{{ url_for('search') }}" method="POST">
+							<div class="input-group">
+								<label class="sr-only" for="search-form">חפש באתר</label>
+								<input type="text" class="form-control" id="search-form" name="search-form">
+								<span class="input-group-btn">
+									<button class="btn btn-default" type="button">
+										<span class="glyphicon glyphicon-search"></span>
+										<span class="sr-only">חיפוש</span>
+									</button>
+								</span>
+							</div>
+						</form>
+					</div>
+
+					<!-- list group -->
+					<div class="list-group margin-b-3">
+					{% for tag in tags %}
+						{% if tag != 'System Messages' %}
+							{% if post is defined and tag in post['primary_tag'] %}
+								<a href="/{{ tag }}" class="active list-group-item"> {{ tag }}</a>
+							{% else %}
+								<a href="/{{ tag }}" class="list-group-item">{{ tag }}</a>
+							{% endif %}
+						{% endif %}
+					{% endfor %}
+					</div>
+
+					<!-- Panel -->
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">עשרת הפרסומים האחרונים</h4>
+						</div>
+						<div class="panel-body">
+							{% for post in last_posts %}
+								<a href="/posts/{{ post['title'] }}">{{ post['title'] }} </a><br/>
+							{% endfor %}
+						</div>
+					</div>
+
+					<!-- Panel -->
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h4 class="panel-title">עשרת הפרסומים הנצפים ביותר</h4>
+						</div>
+						<div class="panel-body">
+							<table>
+								{% for top_post in top_posts %}
+									<tr>
+										<td>
+											<a href="/posts/{{ top_post['title'] }}">{{ top_post['title'] }}</a><br/>
+										</td>
+
+									</tr>
+								{% endfor %}
+							</table>
+						</div>
+					</div>
+
+				</div>
+			</div>
+			<!-- /.row -->
+
+			<hr>
+			<footer class="margin-tb-3">
+				<div class="row">
+					<div class="col-lg-12">
+						<p>כל הזכויות שמורות &copy; <a href="{{ url_for('index') }}">BackendRanch</a> 2016</p>
+					</div>
+				</div>
+			</footer>
+		</div>
+		<!-- /.container-fluid -->
+
+		<!-- JQuery scripts -->
+	    <script src="/static/assets/js/jquery-1.11.2.min.js"></script>
+
+		<!-- Bootstrap Core scripts -->
+		<script src="/static/assets/js/bootstrap.min.js"></script>
+  </body>
+</html>
+

@@ -1,0 +1,12 @@
+{% extends 'layout.html'%}
+{% block header %}
+<h1>אופס! משהו השתבש.</h1>
+
+{% endblock %}
+
+{% block middle_area %}
+<h2>סיבה: </h2>
+<h3> <i><b> {{ reason }} </b></i></h3>
+<h3> אנא נסה שוב שנית. אם הכשלון מתמשך, אנא  <a href="/contact">צור קשר </a> איתי.</h3>
+<img src="/static/pictures/oops.jpg">
+{% endblock %}

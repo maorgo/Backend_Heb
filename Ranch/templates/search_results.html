@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+
+{% block header %}
+    <h1>תוצאות חיפוש עבור '{{ keyword }}'</h1>
+{% endblock %}
+
+{% block middle_area %}
+{% if no_results %}
+	<h4>אין תוצאות חיפוש עבור {{ keyword }}</h4>
+{% else %}
+	<table border='0'>
+		<tr>
+			<td>
+				כותרת&nbsp;&nbsp;&nbsp;
+			</td>
+			<td>
+				קטגוריה&nbsp;&nbsp;&nbsp;&nbsp;
+			</td>
+			<td>
+				תאריך
+			</td>
+		</tr>
+		{% for post in post_results %}
+		<tr>
+			<td>
+				<a href='{{ url_for("post", title=post["title"])}}'>{{ post['title'] }}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+			</td>
+			<td>
+				<a href="/{{ post['primary_tag'] }}">{{ post['primary_tag']}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+			</td>
+			<td>
+				{{post['date'].strftime('%Y-%m-%d  %H-%M')}}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+{% endif %}
+{% endblock %}

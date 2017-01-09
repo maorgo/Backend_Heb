@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+{% block header %}
+<h1>צור קשר </h1>
+<p>פורסם ע"י <span class="glyphicon glyphicon-user"></span> <a href="/about">מאור גואז</a> בתאריך <span class="glyphicon glyphicon-time"></span> 2016-07-31 &nbsp;<img src="/static/pictures/tag.png" height="20" width="20"> &nbsp;מערכת</p>
+{% endblock %}
+
+{% block middle_area %}
+	<p class="lead">{{ post['lead']|safe }} </p>
+						<div class='well'>
+		<form action="{{ url_for('contact_me') }}" method="post">
+			<div class='form-group'>
+				<label for='contactName'>שם</label>
+				<input type='SEARCH' class='form-control' id='contactName' name='contactName' placeholder='הכנס את שמך'>
+			</div>
+			<div class='form-group'>
+				<label for='contactEmail'>דוא"ל</label>
+				<input type='email' class='form-control' id='contactEmail' name='contactEmail' placeholder='הכנס כתובת דוא"ל'>
+				<p class='help-block'>נא ודא כי אתה משתמש בכתובת דוא"ל תקנית.</p>
+			</div>
+			<div class='form-group'>
+				<label for='contactComment'>הודעה</label>
+					<textarea class='form-control' id='contactComment' name='contactComment'></textarea>
+			</div>
+			<button type='submit' class="btn btn-default">שלח</button>
+		</form>
+	</div>
+	{% if success %}
+		<center><h3> תודה לך. ההודעה שלך נשלחה בהצלחה. </h3></center>
+	{% elif failure %}
+		<center><h3> כשלון בעת שליחת ההודעה: <br>{{ failure_reason }} </h3></center>
+	{% endif %}
+{% endblock %}

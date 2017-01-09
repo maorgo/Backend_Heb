@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block content %}
+    <table id="posttable" width="70%" align="center" cellpadding="14">
+        <tr>
+            <td id="backgroundtd">
+                <h1>Create a Post </h1>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table border="0" cellpadding="14">
+                    <form action="" method="POST">
+                    <tr>
+                        <td>
+                            Post's title:
+                        </td>
+                        <td>
+                            <input type="text" size="149" name="title">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td valign="top">
+                        </td>
+                        <td>
+                            <textarea cols="150" rows="35" name="post"> </textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Post's tags:
+                        </td>
+                        <td>
+                            {% for tag in tags['tags'] %}
+                            <label>
+                                <input type="checkbox" name="{{ tag }}"> {{ tag }}  {% endfor %}
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> <input type="submit" value="Post it!"> </td>
+                    </tr>
+                </form>
+                </table>
+            </td>
+        </tr>
+    </table>
+{% endblock %}

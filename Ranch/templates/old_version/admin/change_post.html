@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block content %}
+    <table id="posttable" width="70%" align="center" cellpadding="14">
+        <tr>
+            <td id="backgroundtd">
+                <h1> Edit a Post </h1>
+            </td>
+        </tr>
+        <td>
+            <table border="0" cellpadding="14">
+                    <form action="" method="POST">
+                    <tr>
+                    <td valign="top">
+                        Choose from the following list:
+                    </td>
+                    <td>
+                        {% for title in titles %}
+                            <label>
+                                <input type="checkbox" name="{{ title }}"> {{ title['title'] }} <br>
+                            </label>
+                        {% endfor %}
+                    </td>
+
+                    </tr>
+                    <tr>
+                        <label>
+                            <td align="right">
+                                <label>
+                                    <input type="checkbox" name="delete"> Delete?
+                                </label>
+                            </td>
+                        </label>
+                        <td align="left"> <input type="submit" value='Submit Operation' name="Submit"> </td>
+                    </tr>
+                </form>
+                </table>
+        </td>
+    </table>
+{% endblock %}

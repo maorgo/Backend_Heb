@@ -1,0 +1,113 @@
+table {
+    border: 0px solid;
+    border-color: #6D6D6D;
+    border-collapse: collapse;
+}
+
+body {
+    background-color: #F9F9F9;
+    color: #34495E;
+    font-size: 18px;
+    font-family: Arial;
+    letter-spacing: 1px;
+    line-height: 160%;
+    /* white-space: pre-line;*/
+}
+
+h1 {
+    font-size:20px;
+    color: white;
+    font-weight: normal;
+}
+
+h2 {
+    font-size:28px;
+    color: white;
+    font-weight: normal;
+}
+
+h3 {
+    font-size:25px;
+    color: white;
+    font-weight: normal;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    direction: rtl;
+}
+
+#logotable {
+    box-shadow: 3px 3px 5px #888888;
+    background-color: #848484;
+
+}
+
+#posttable {
+    border-radius: 25px;
+    box-shadow: 3px 3px 5px #888888;
+    background-color: #F2F3F4;
+}
+
+a.system {
+    color: white;
+    text-decoration: none; /* no underline */
+}
+
+a.system:hover {
+    font-weight: bold;
+}
+
+a.post {
+    text-decoration: none;
+    color: #34495E;
+}
+
+a.post:hover {
+    text-decoration: underline;
+}
+
+#post_link {
+    color: #34495E;
+}
+#post_link:hover {
+    text-decoration: underline;
+}
+
+#post-subject {
+    border-radius: 25px;
+    box-shadow: 13px 13px 15px #888888;
+    background-color: #F2F3F4;
+}
+
+#backgroundtd {
+    background-color: #848484;
+    padding: 4px;
+}
+
+#admin-options {
+    border-radius: 25px;
+    box-shadow: 3px 3px 15px #888888;
+    background-color: #F2F3F4;
+}
+
+#title-link {
+    text-decoration: none;
+}
+
+p.python {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    background-color: #E6E6E6;
+    display: block;
+    color: #6E6E6E;
+    font-weight: bold;
+}
+
+textarea.edit {
+    font-size: 18px;
+}

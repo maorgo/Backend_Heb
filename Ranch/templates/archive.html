@@ -1,0 +1,48 @@
+{% extends 'layout.html' %}
+
+{% block header %}
+<h1>ארכיון פרסומים </h1>
+<p>פורסם ע"י <span class="glyphicon glyphicon-user"></span> <a href="/about">מאור גואז</a> בתאריך <span class="glyphicon glyphicon-time"></span> 2016-07-31 &nbsp;<img src="/static/pictures/tag.png" height="20" width="20"> &nbsp;מערכת</p>
+{% endblock %}
+
+
+{% block middle_area %}
+	<figure class="margin-b-2">
+		<img class="img-responsive" src="/static/pictures/archive5.jpg" alt="">
+		<figcaption class="margin-t-h">זה לא יהיה כזה נוראי :)</figcaption>
+	</figure>
+
+
+	<table border='0'>
+		<tr>
+			<td>
+				כותרת
+			</td>
+			<td>
+				נושא מרכזי
+			</td>
+			<td>
+				נושא משני&nbsp;&nbsp;
+			</td>
+			<td>
+				תאריך
+			</td>
+		</tr>
+		{% for post in posts %}
+		<tr>
+			<td>
+				<a href='{{ url_for("post", title=post["title"])}}'>{{ post['title'] }}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+			</td>
+			<td>
+				{{ post['primary_tag']}}&nbsp;&nbsp;&nbsp;&nbsp;
+			</td>
+			<td>
+				{{ post['secondary_tags']|join(', ')}}&nbsp;&nbsp;&nbsp;&nbsp;
+			</td>
+			<td>
+				{{post['date'].strftime('%Y-%m-%d  %H-%M')}}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+{% endblock %}

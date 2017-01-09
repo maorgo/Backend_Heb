@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+{% block header %}
+    <h1>Admin Page</h1>
+    This is where the magic is maintained :)
+{% endblock %}
+
+{% block middle_area %}
+    <table width="300" cellspacing="100" cellpadding="100" align="center">
+        <tr>
+            <td>
+                <a href="{{ url_for('posts_admin') }}" class="list-group-item"><center>Posts</center></a>
+            </td>
+            <td>
+                &nbsp;&nbsp;
+            </td>
+            <td>
+                <a href="{{ url_for('tags_admin') }}" class="list-group-item"><center>Tags</center></a>
+            </td>
+                        <td>
+                &nbsp;&nbsp;
+            </td>
+            <td>
+                <a href="/admin/comments.html" class="list-group-item"><center>Comments</center></a>
+            </td>
+        </tr>
+    </table>
+
+{% endblock %}

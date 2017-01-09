@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% block content %}
+    <table id="posttable" width="70%" align="center" cellpadding="30">
+        <tr>
+            <td id="backgroundtd">
+                <h3>&nbsp;&nbsp;Admin Panel </h3>
+            </td>
+        </tr>
+        <td>
+            <table id="admin-options" width="80%" align="center" cellpadding="44" border="1">
+                <tr>
+                    <td id="backgroundtd">
+                        <a class="system" href="/admin/manage_posts"> <center><h3>Manage Posts</h3></center></a>
+                    </td>
+                    <td id="backgroundtd">
+                        <a class="system" href="/admin/manage_users"> <center><h3>Manage Users</h3></center></a>
+                    </td>
+                    <td id="backgroundtd">
+                        <a class="system" href="/admin/python"> <center><h3>Other functionality</h3></center></a>
+                    </td>
+
+                </tr>
+            </table>
+        </td>
+    </table>
+    <br><br>
+    {% if admin_message is defined %}
+        <table align="center" border="0">
+            <tr>
+                <td> {{ admin_message }} </td>
+            </tr>
+        </table>
+    {% endif %}
+{% endblock %}

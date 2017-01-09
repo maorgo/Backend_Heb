@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+{% block header %}
+    <h1>Tags Administrator</h1>
+{% endblock %}
+
+{% block middle_area %}
+    {% if message %}
+        <h3> {{ message }} </h3>
+        <br>
+    {% endif %}
+    {% for each_tag in tags %}
+        <a href="{{ url_for('delete_tag', tag_to_delete=each_tag) }}">
+            <img src="{{img}}" height="10" width="10">
+        </a>
+        &nbsp;&nbsp;{{ each_tag }} <br>
+    {% endfor %}
+
+    <br><br>
+    <h4> Add a new tag: </h4>
+    <form action="{{ url_for('add_tag') }}" method="post">
+    <input type="text" name="new_tag">
+    <input type="submit" value="submit">
+    </form>
+{% endblock %}

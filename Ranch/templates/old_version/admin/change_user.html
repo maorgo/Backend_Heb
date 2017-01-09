@@ -1,0 +1,70 @@
+{% extends "layout.html" %}
+{% block content %}
+    <center>{{ message|safe }}</center>
+    <table id="posttable" width="70%" align="center" cellpadding="14">
+        <tr>
+            <td id="backgroundtd">
+                <h1>Modify a User </h1>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table border="0" cellpadding="14">
+                    <form action="" method="POST">
+                    <tr>
+                        <td>
+                            Old Username:
+                        </td>
+                        <td>
+                            <input type="text" size="60" name="old_username">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Username:
+                        </td>
+                        <td>
+                            <input type="text" size="60" name="username">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Password:
+                        </td>
+                        <td>
+                            <input type="password" size="60" name="password">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Confirm Password:
+                        </td>
+                        <td>
+                            <input type="password" size="60" name="confirm_password">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Email Address:
+                        </td>
+                        <td>
+                            <input type="text" size="60" name="email">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Interests:
+                        </td>
+                        <td>
+                            <textarea cols="60" rows="10" name="interests"></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> <input type="submit" value="Go!"> </td>
+                    </tr>
+                </form>
+                </table>
+            </td>
+        </tr>
+    </table>
+{% endblock %}

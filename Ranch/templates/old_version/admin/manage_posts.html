@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+    <table id="posttable" width="70%" align="center" cellpadding="30">
+        <tr>
+            <td id="backgroundtd">
+                <h3>&nbsp;&nbsp;Posts Management Panel </h3>
+            </td>
+        </tr>
+        <td>
+            <table id="admin-options" width="550" align="center" cellpadding="44" border="1">
+                <tr>
+                    <td id="backgroundtd">
+                        <a class="system" href="/admin/create_post"> <center><h3>Create a Post</h3></center></a>
+                    </td>
+                    <td id="backgroundtd">
+                        <a class="system" href="/admin/change_post"> <center><h3>Modify a Post</h3></center></a>
+                    </td>
+
+                </tr>
+            </table>
+        </td>
+    </table>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'layout.html' %}
+{% block header %}
+    <h1>Posts Admin Page</h1>
+{% endblock %}
+
+{% block middle_area %}
+    <form action="{{ url_for('delete_post') }}" method="post">
+        <table border='0'>
+            <tr>
+                <td>
+                    <b>Delete</b>&nbsp;&nbsp;&nbsp;&nbsp;
+                </td>
+                <td>
+                    <b>Title</b>
+                </td>
+                <td>
+                    <b>Categories</b>
+                </td>
+                <td>
+                    <b>Date</b>
+                </td>
+            </tr>
+            {% for post in all_posts %}
+            <tr>
+                <td>
+                    <input type="checkbox" class='form-control' id="to_delete" name="{{post['title']}}">
+
+                </td>
+                <td>
+                    <a href='{{ url_for("edit_post", title=post["title"])}}'>{{ post['title'] }}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                </td>
+                <td>
+                    {{ post['primary_tag']}}&nbsp;&nbsp;&nbsp;&nbsp;
+                </td>
+                <td>
+                    {{post['date'].strftime('%Y-%m-%d  %H-%M')}}
+                </td>
+            </tr>
+            {% endfor %}
+                        <tr>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                </td>
+                <td>
+                    <br>
+                    Total Posts: {{ posts_number }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <br>
+                    <input type="submit" class="btn btn-default" value="Delete">
+                </td>
+                <td>
+                    <br> &nbsp;
+                    <a href="{{ url_for('create_post') }}">
+                        <div type="submit" class="btn btn-default">Create a post</div>
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </form>
+{% endblock %}

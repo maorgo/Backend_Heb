@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block content %}
+<table id="posttable" width="70%" align="center" cellpadding="14">
+    <tr>
+        <td id="backgroundtd"> <h1>&nbsp;Contact Me </h1></td>
+    </tr>
+    <tr>
+        <td><font size="4">
+            <form>
+                <table >
+                    <tr>
+                        <td>Name:</td><td><input type="text" name="name" size="40"> </td>
+                    </tr>
+                    <tr>
+                        <td>e-mail:</td><td><input type="text" name="email" size="40"> </td>
+                    </tr>
+                    <tr>
+                        <td>Name:</td><td><textarea name="message" rows="15" cols="80"> </textarea></td>
+                    </tr>
+                    <tr>
+                        <td><input type="submit" value="Send!"> </td>
+                    </tr>
+                </table>
+            </form>
+
+        </font></td>
+    </tr>
+    </table>
+<br> <br>
+{% endblock %}
