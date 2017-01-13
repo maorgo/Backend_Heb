@@ -1,5 +1,5 @@
 from Ranch import db
-from Ranch.database import Base
+from sqlalchemy import func
 
 
 class Post(db.Model):
@@ -9,19 +9,18 @@ class Post(db.Model):
     Image_Caption = db.Column(db.String(64))
     Title = db.Column(db.String(120), unique=True, primary_key=True)
     Lead = db.Column(db.String(512))
-    Date = db.Column(db.DateTime)
+    Date = db.Column(db.DateTime, default=func.now())
     Text = db.Column(db.String(512))
     Primary_Tag = db.Column(db.String(256))
     Secondary_Tag = db.Column(db.String(256))
     Views = db.Column(db.Integer)
 
-    def __init__(self, author, image_location, image_caption, title, lead, date, text, primary_tag, secondary_tag):
+    def __init__(self, author, image_location, image_caption, title, lead, text, primary_tag, secondary_tag):
         self.Author = author
         self.Image_Location = image_location
         self.image_Caption = image_caption
         self.Title = title
         self.Lead = lead
-        self.Date = date
         self.Text = text
         self.Primary_Tag = primary_tag
         self.Secondary_Tag = secondary_tag
@@ -38,6 +37,13 @@ class Comments(db.Model):
     Name = db.Column(db.String(128))
     Comment = db.Column(db.Text())
     CommentTo = db.Column(db.String(64))
+
+    def __init__(self, comment_id, post_id, name, comment, comment_to):
+        self.CommentID = comment_id
+        self.PostID = post_id
+        self.Name = name
+        self.Comment = comment
+        self.CommentTo = comment_to
 
 
 class Tag(db.Model):

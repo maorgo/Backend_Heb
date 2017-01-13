@@ -31,16 +31,16 @@
 		{% for post in posts %}
 		<tr>
 			<td>
-				<a href='{{ url_for("post", title=post["title"])}}'>{{ post['title'] }}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+				<a href='{{ url_for("post", title=post.Title)}}'>{{ post.Title }}</a>&nbsp;&nbsp;&nbsp;&nbsp;
 			</td>
 			<td>
-				{{ post['primary_tag']}}&nbsp;&nbsp;&nbsp;&nbsp;
+				{{ post.Primary_Tag}}&nbsp;&nbsp;&nbsp;&nbsp;
 			</td>
 			<td>
-				{{ post['secondary_tags']|join(', ')}}&nbsp;&nbsp;&nbsp;&nbsp;
+				{{ post.Secondary_Tag}}&nbsp;&nbsp;&nbsp;&nbsp;
 			</td>
 			<td>
-				{{post['date'].strftime('%Y-%m-%d  %H-%M')}}
+				{{post.Date}}
 			</td>
 		</tr>
 		{% endfor %}

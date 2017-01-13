@@ -81,8 +81,8 @@
 					{% if newer_older %}
 					<nav>
 						<ul class="pager">
-							<li class="previous"><a href="{{ url_for('newer', post_title=post['title']) }}"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> חדש יותר</a></li>
-							<li class="next"><a href="{{ url_for('older', post_title=post['title']) }}"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> ישן יותר </a></li>
+							<li class="previous"><a href="{{ url_for('newer', post_title=post.Title) }}"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> חדש יותר</a></li>
+							<li class="next"><a href="{{ url_for('older', post_title=post.Title) }}"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> ישן יותר </a></li>
 						</ul>
 					</nav>
 					{% endif %}
@@ -93,8 +93,8 @@
 					{% if newer_older %}
 					<nav>
 						<ul class="pager">
-							<li class="previous"><a href="{{ url_for('newer', post_title=post['title']) }}"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> חדש יותר</a></li>
-							<li class="next"><a href="{{ url_for('older', post_title=post['title']) }}"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> ישן יותר </a></li>
+							<li class="previous"><a href="{{ url_for('newer', post_title=post.Title) }}"><span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span> חדש יותר</a></li>
+							<li class="next"><a href="{{ url_for('older', post_title=post.Title	) }}"><span class="glyphicon glyphicon-menu-right" aria-hidden="true"></span> ישן יותר </a></li>
 						</ul>
 					</nav>
 					{% endif %}
@@ -121,11 +121,11 @@
 					<!-- list group -->
 					<div class="list-group margin-b-3">
 					{% for tag in tags %}
-						{% if tag != 'System Messages' %}
-							{% if post is defined and tag in post['primary_tag'] %}
-								<a href="/{{ tag }}" class="active list-group-item"> {{ tag }}</a>
+						{% if tag.tag != 'System Messages' %}
+							{% if post is defined and tag.tag == post.Primary_Tag %}
+								<a href="/{{ tag.tag }}" class="active list-group-item"> {{ tag.tag }}</a>
 							{% else %}
-								<a href="/{{ tag }}" class="list-group-item">{{ tag }}</a>
+								<a href="/{{ tag.tag }}" class="list-group-item">{{ tag.tag }}</a>
 							{% endif %}
 						{% endif %}
 					{% endfor %}
@@ -134,11 +134,11 @@
 					<!-- Panel -->
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h4 class="panel-title">עשרת הפרסומים האחרונים</h4>
+							<h4 class="panel-title">חמשת הפרסומים האחרונים</h4>
 						</div>
 						<div class="panel-body">
 							{% for post in last_posts %}
-								<a href="/posts/{{ post['title'] }}">{{ post['title'] }} </a><br/>
+								<a href="/posts/{{ post.Title }}">{{ post.Title }} </a><br/>
 							{% endfor %}
 						</div>
 					</div>
@@ -146,14 +146,14 @@
 					<!-- Panel -->
 					<div class="panel panel-default">
 						<div class="panel-heading">
-							<h4 class="panel-title">עשרת הפרסומים הנצפים ביותר</h4>
+							<h4 class="panel-title">חמשת הפרסומים הנצפים ביותר</h4>
 						</div>
 						<div class="panel-body">
 							<table>
 								{% for top_post in top_posts %}
 									<tr>
 										<td>
-											<a href="/posts/{{ top_post['title'] }}">{{ top_post['title'] }}</a><br/>
+											<a href="/posts/{{ top_post.Title }}">{{ top_post.Title }}</a><br/>
 										</td>
 
 									</tr>
@@ -170,7 +170,7 @@
 			<footer class="margin-tb-3">
 				<div class="row">
 					<div class="col-lg-12">
-						<p>כל הזכויות שמורות &copy; <a href="{{ url_for('index') }}">BackendRanch</a> 2016</p>
+						<p>כל הזכויות שמורות &copy; <a href="{{ url_for('index') }}">BackendRanch</a> 2017</p>
 					</div>
 				</div>
 			</footer>

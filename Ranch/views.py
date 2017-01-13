@@ -1,3 +1,7 @@
+# -*- coding: utf-8 -*-
+# TODO: Add time to Date column @ posts table
+# TODO: Check that last_post updates every time a new post
+# TODO: Fix older / newer posts
 from time import strftime, gmtime
 import os
 import smtplib
@@ -9,9 +13,10 @@ from werkzeug.utils import secure_filename
 from Ranch import app, DBSession
 import methods
 import settings
-from methods import posts_collection, db
-from models import Comments, Post, Test
+from methods import posts_collection, db, tags
+from models import Comments, Post
 import sqlalchemy
+import logging
 
 conf = settings.Configure()
 session = DBSession()
@@ -19,48 +24,31 @@ session = DBSession()
 
 @app.route('/')
 def index():
-    # p = Post(author='Maor2', image_location='Location5', image_caption='Caption2', title='Title5', lead='Lead2',
-    #          date=strftime("%Y-%m-%d %H:%M:%S", gmtime()), text='Text2', primary_tag='Primary_Tag2', secondary_tag='second2')
-    # session.add(p)
-    # print '1'
-    # try:
-    #     session.commit()
-    # except Exception, e:
-    #     print str(e)
-    # print 'ok'
-    # try:
-    #     print session.query(Post).all()
-    # except Exception, e:
-    #     print e
+    # add = methods.add_post(author=u'מאור גואז', img_cap=u'זה ההסבר לתמונה', img_loc='/112111', prim_tag=u'הודעות מערכת',
+    #                        text=u'כאן נכנס הטקסט', lead=u'זו ההקדמה', title=u'אודות הבלוג', second_tag='Python')
+
     last_post = session.query(Post).filter(Post.Primary_Tag != 'System Messages').\
-        order_by(sqlalchemy.desc(Post.Date)).limit(1).first()
-    return render_template('post.html', post=last_post)
-    last_post = posts_collection.find({'primary_tag': {'$ne': 'System Messages'}}).sort('date', -1).limit(1)
-    if last_post.count() < 1:
-        return render_template('oops.html', tags=methods.tags, last_posts=methods.last_posts(),
-                               top_posts=methods.top_posts())
-    last_post = last_post[0]
-    return render_template('post_mongo.html', post=last_post, tags=methods.tags, newer_older=True,
-                           top_posts=methods.top_posts(), last_posts=methods.last_posts())
+                order_by(sqlalchemy.desc(Post.Date)).limit(1).first()
+    if not last_post:
+        return render_template('oops.html', tags=tags, last_posts=methods.last_posts, top_posts=methods.top_posts())
+    return render_template('post.html', post=last_post, last_posts=methods.last_posts, tags=methods.tags,
+                           top_posts=methods.top_posts(), newer_older=True)
 
 
 @app.route('/archive')
 def archive():
-    # Placeholder. Should work on it.
-    posts = posts_collection.find({'tags': {'$nin': ['System Messages']}}).sort('date', pymongo.DESCENDING)
-
-    return render_template('archive.html', tags=methods.tags, last_posts=methods.last_posts(),
-                           top_posts=methods.top_posts(), posts=posts)
+    posts = session.query(Post).filter(Post.Primary_Tag != 'System Messages').order_by(sqlalchemy.desc(Post.Date)).all()
+    return render_template('archive.html', posts=posts, last_posts=methods.last_posts, tags=methods.tags,
+                               top_posts=methods.top_posts())
 
 
 @app.route('/about')
 def about():
-    about_post = posts_collection.find({'title': 'About this blog', 'primary_tag': 'System Messages'})
-    if about_post.count() != 1:
-        return render_template('oops.html', reason='No such post found')
-    about_post = about_post[0]
-    return render_template('post_mongo.html', post=about_post, tags=methods.tags, last_posts=methods.last_posts(),
-                           top_posts=methods.top_posts())
+    about_p = session.query(Post).filter(Post.Title == u'אודות הבלוג' and Post.Primary_Tag == u'הודעות מערכת').first()
+    if about_p:
+        return render_template('post.html', post=about_p, last_posts=methods.last_posts, tags=methods.tags,
+                               top_posts=methods.top_posts())
+    return render_template('oops.html', reason=u'הפוסט הרצוי לא נמצא')
 
 
 @app.route('/contact')
@@ -69,53 +57,62 @@ def contact():
     # contact_me = posts_collection.find({'title': 'Contact Me'}).limit(1)[0]
     # return render_template('post_mongo.html',post=contact_me, last_posts=methods.last_posts(),
     # top_posts=methods.top_posts(), tags=methods.tags)
-    return render_template('contact.html', post='', last_posts=methods.last_posts(), top_posts=methods.top_posts(),
+    return render_template('contact.html', post='', last_posts=methods.last_posts, top_posts=methods.top_posts(),
                            tags=methods.tags)
 
 
 @app.route('/<title>')
 def tag(title):
-    tag_post = posts_collection.find({'primary_tag': title}).sort('date', pymongo.DESCENDING).limit(1)
-    if tag_post.count() < 1:
-        return render_template('oops.html', tags=methods.tags, last_posts=methods.last_posts(),
-                               top_posts=methods.top_posts(), reason="No articles for this subject were found.")
-    else:
-        tag_post = tag_post[0]
-    return redirect('/posts/{0}'.format(tag_post['title']))
+    tag_post = session.query(Post).filter(Post.Primary_Tag == title).first()
+    if tag_post:
+        return redirect(u'/posts/{0}'.format(title))
+    return render_template('oops.html', last_posts=methods.last_posts, top_posts=methods.top_posts(),
+                           tags=methods.tags)
 
 
 @app.route('/posts/<title>')
 def post(title):
-    blog_post = posts_collection.find({'title': title})
-    if blog_post.count() < 1:
-        return render_template('oops.html', tags=methods.tags, last_posts=methods.last_posts(),
-                               top_posts=methods.top_posts())
-    blog_post = blog_post[0]
-
-    posts_collection.update({'title': blog_post['title']}, {'$set': {'views': blog_post['views'] + 1}})
-    return render_template('post_mongo.html', post=blog_post, top_posts=methods.top_posts(), last_posts=methods.last_posts(),
-                           newer_older=True, tags=methods.tags)
+    blog_post = session.query(Post).filter(Post.Title == title).first()
+    if blog_post:
+        blog_post.Views += 1
+        session.commit()
+        return render_template('post.html', last_posts=methods.last_posts, post=blog_post, tags=methods.tags,
+                               top_posts=methods.top_posts(), newer_older=True)
+    else:
+        return render_template('oops.html', last_posts=methods.last_posts, top_posts=methods.top_posts(),
+                               tags=methods.tags)
 
 
 @app.route('/older/<string:post_title>')
 def older(post_title):
-    older_post = posts_collection.find({'title': post_title}, {'date': 1, '_id': 0, 'primary_tag': 1})
-    if older_post.count() != 1:
-        return render_template('oops.html', tags=methods.tags, last_posts=methods.last_posts(),
+    current_post = session.query(Post).filter(Post.Title == post_title).first()
+    if current_post:
+
+        older_post = session.query(Post).filter(Post.Date <= current_post.Date).order_by(sqlalchemy.desc(Post.Date)).first()
+        if older_post:
+            older_post = methods.view_add(older_post)
+            return redirect(u'/posts/{0}'.format(older_post.Title))
+        return render_template('oops.html', last_posts=methods.last_posts, tags=methods.tags,
                                top_posts=methods.top_posts(),
-                               reason='While pressing older, found more or less than 1, maybe conflicting titles')
-    older_post = older_post[0]
-    older_post = posts_collection.find({'primary_tag': older_post['primary_tag'],
-                                        'date': {'$lt': older_post['date']}}).sort('date', -1).limit(1)
-    # Check that there was an older post
-    if older_post.count() < 1:
-        return redirect('/posts/{0}'.format(post_title))
-    older_post = older_post[0]
-    return redirect('/posts/{0}'.format(older_post['title']))
+                               newer_older=True, reason=u'שגיאה בעת מציאת פוסט ישן יותר.')
+    return render_template('oops.html', last_posts=methods.last_posts, tags=methods.tags, top_posts=methods.top_posts(),
+                           newer_older=True, reason=u'שגיאה בעת מציאת פוסט נוכחי.')
 
 
 @app.route('/newer/<post_title>')
 def newer(post_title):
+    current_post = session.query(Post).filter(Post.Title == post_title).first()
+    if current_post:
+        newer_post = session.query(Post).filter(current_post.Date >= Post.Date).order_by(sqlalchemy.desc(Post.Date)).first()
+        if newer_post:
+            newer_post = methods.view_add(newer_post)
+            return redirect(u'/posts/{0}'.format(newer_post.Title))
+        return render_template('oops.html', last_posts=methods.last_posts, tags=methods.tags,
+                               top_posts=methods.top_posts(),
+                               newer_older=True, reason=u'שגיאה בעת מציאת פוסט חדש יותר.')
+    return render_template('oops.html', last_posts=methods.last_posts, tags=methods.tags, top_posts=methods.top_posts(),
+                           newer_older=True, reason=u'שגיאה בעת מציאת פוסט נוכחי.')
+
     older_post = posts_collection.find({'title': post_title}, {'primary_tag': 1, 'date': 1, 'secondary_tags': 1,
                                                                'title': 1})
     if older_post.count() != 1:
@@ -496,6 +493,8 @@ def downvote(comment_id, title):
 @app.route('/subscribe', methods=['GET', 'POST'])
 def subscribe():
     if request.method == 'GET':
+        return render_template('subscribe.html', last_posts=methods.last_posts, tags=methods.tags,
+                               top_posts=methods.top_posts())
         return render_template('subscribe.html', top_posts=methods.top_posts(), last_posts=methods.last_posts(),
                                tags=methods.tags)
     else:
