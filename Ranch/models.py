@@ -15,7 +15,7 @@ class Post(db.Model):
     Secondary_Tag = db.Column(db.String(256))
     Views = db.Column(db.Integer)
 
-    def __init__(self, author, image_location, image_caption, title, lead, text, primary_tag, secondary_tag):
+    def __init__(self, author, image_location, image_caption, title, lead, text, primary_tag, secondary_tag, date):
         self.Author = author
         self.Image_Location = image_location
         self.image_Caption = image_caption
@@ -25,6 +25,7 @@ class Post(db.Model):
         self.Primary_Tag = primary_tag
         self.Secondary_Tag = secondary_tag
         self.Views = 0
+        self.Date = date
 
     def __repr__(self):
         return '<Post Title {0}>'.format(self.Title)

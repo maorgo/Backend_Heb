@@ -14,4 +14,6 @@ class Configure:
         self.database_connection_string = 'postgresql://postgres:postgres@localhost/blog'
         self.LOG_LEVEL = logging.DEBUG
         self.BLOG_NAME = 'BackendRanch'
+        self.BLOG_PREFIX = 'com'
         self.LOG_NAME = 'BackendRanch.log'
+        self.RECIEVE_ADDRESS = ''

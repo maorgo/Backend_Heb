@@ -23,17 +23,17 @@
             {% for post in all_posts %}
             <tr>
                 <td>
-                    <input type="checkbox" class='form-control' id="to_delete" name="{{post['title']}}">
+                    <input type="checkbox" class='form-control' id="to_delete" name="{{post.Title}}">
 
                 </td>
                 <td>
-                    <a href='{{ url_for("edit_post", title=post["title"])}}'>{{ post['title'] }}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+                    <a href='{{ url_for("edit_post", title=post.Title)}}'>{{ post.Title }}</a>&nbsp;&nbsp;&nbsp;&nbsp;
                 </td>
                 <td>
-                    {{ post['primary_tag']}}&nbsp;&nbsp;&nbsp;&nbsp;
+                    {{ post.Primary_Tag}}&nbsp;&nbsp;&nbsp;&nbsp;
                 </td>
                 <td>
-                    {{post['date'].strftime('%Y-%m-%d  %H-%M')}}
+                    {{post.Date}}
                 </td>
             </tr>
             {% endfor %}
@@ -46,7 +46,7 @@
                 </td>
                 <td>
                     <br>
-                    Total Posts: {{ posts_number }}
+                    Total Posts: {{ all_posts|length }}
                 </td>
             </tr>
             <tr>

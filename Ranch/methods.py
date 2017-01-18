@@ -55,7 +55,7 @@ def top_posts():
 
 
 def email_post(title, primary_tag, date):
-    with open('MAILING_LIST', 'r') as f:
+    with open('C:\Users\goas\Desktop\personal\Backend_Heb\Ranch\MAILING_LIST', 'r') as f:
         mailing_list = f.read().split('\n')
         if not mailing_list:
             return False
@@ -64,8 +64,8 @@ def email_post(title, primary_tag, date):
         origin = 'blog@BackendRanch.dom'
         to = mailing_list
         subject = 'New Post From BackendRanch'
-        text = 'Hello, \nthe post \'{0}\' was published at {1} and is regarding {2}!\nYou should really check ' \
-               'it out!\n{3}\n\nBackendRanch'.format(title, date, primary_tag, conf.POST_LINK + title)
+        text = u'Hello, \nthe post \'{0}\' was published at {1} and is regarding {2}!\nYou should really check ' \
+               u'it out!\n{3}\n\nBackendRanch'.format(title, date, primary_tag, conf.POST_LINK + title)
         message = """From: %s\nTo: %s\nSubject: %s\n\n%s
         """ % (origin, ", ".join(to), subject, text)
         server = smtplib.SMTP("smtp.gmail.com", 587)

@@ -9,10 +9,10 @@
         <br>
     {% endif %}
     {% for each_tag in tags %}
-        <a href="{{ url_for('delete_tag', tag_to_delete=each_tag) }}">
+        <a href="{{ url_for('delete_tag', tag_to_delete=each_tag.tag) }}">
             <img src="{{img}}" height="10" width="10">
         </a>
-        &nbsp;&nbsp;{{ each_tag }} <br>
+        &nbsp;&nbsp;{{ each_tag.tag }} <br>
     {% endfor %}
 
     <br><br>
