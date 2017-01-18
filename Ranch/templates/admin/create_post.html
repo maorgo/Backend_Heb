@@ -8,8 +8,9 @@
     {% if successful %}
         <h2> הפוסט נוצר בהצלחה!</h2>
     {% elif failure %}
-        <h2> שגיאה התרחשה בעת נסיון היצירה: {{error}} </h2>
-
+        <h3> שגיאה התרחשה בעת נסיון היצירה:<br> {{error}} </h3>
+        שאילתא:<br>
+{{detail}}
     {% endif %}
 {% endblock %}
 
@@ -76,9 +77,9 @@
                         <label for="primary_tag">תווית ראשית</label><br>
                         {% for tag in tags %}
                             {% if tag.tag == post.Primary_Tag %}
-                                <input type="checkbox" id="primary_tag" name="primary_tag_{{ tag.tag }}" checked> {{ tag.tag }}&nbsp;
+                                <input type="checkbox" id="primary_tag" name="primary_tag_{{ tag.tag }}" checked> {{ tag.tag }}&nbsp;<br>
                             {% else %}
-                                <input type="checkbox" id="primary_tag" name="primary_tag_{{ tag.tag }}"> {{ tag.tag }}&nbsp;
+                                <input type="checkbox" id="primary_tag" name="primary_tag_{{ tag.tag }}"> {{ tag.tag }}&nbsp;<br>
                             {% endif %}
                         {% endfor %}
                         </div>
@@ -90,9 +91,9 @@
                         <label for="secondary_tags">תווית משנית</label><br>
                         {% for tag in tags %}
                             {% if tag.tag == post.Secondary_Tag %}
-                                <input type="checkbox" id="secondary_tags" name="secondary_tag_{{ tag.tag }}" checked> {{ tag.tag }}&nbsp;
+                                <input type="checkbox" id="secondary_tags" name="secondary_tag_{{ tag.tag }}" checked> {{ tag.tag }}&nbsp;<br>
                             {% else %}
-                                <input type="checkbox" id="secondary_tags" name="secondary_tag_{{ tag.tag }}"> {{ tag.tag }}&nbsp;
+                                <input type="checkbox" id="secondary_tags" name="secondary_tag_{{ tag.tag }}"> {{ tag.tag }}&nbsp;<br>
                             {% endif %}
 
                         {% endfor %}
@@ -155,7 +156,7 @@
                         <div class="form-group">
                         <label for="primary_tag">תווית ראשית</label><br>
                         {% for tag in tags %}
-                            <input type="checkbox" id="primary_tag" name="primary_tag_{{ tag.tag }}"> {{ tag.tag }}&nbsp;
+                            <input type="checkbox" id="primary_tag" name="primary_tag_{{ tag.tag }}"> {{ tag.tag }}&nbsp;<br>
                         {% endfor %}
                         </div>
                     </td>
@@ -165,7 +166,7 @@
                         <div class="form-group">
                         <label for="secondary_tags">תווית משנית</label><br>
                         {% for tag in tags %}
-                            <input type="checkbox" id="secondary_tags" name="secondary_tag_{{ tag.tag }}"> {{ tag.tag }}&nbsp;
+                            <input type="checkbox" id="secondary_tags" name="secondary_tag_{{ tag.tag }}"> {{ tag.tag }}&nbsp;<br>
                         {% endfor %}
                         </div>
                     </td>

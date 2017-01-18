@@ -66,7 +66,9 @@ def contact():
 def tag(title):
     tag_post = session.query(Post).filter(Post.Primary_Tag == title).first()
     if tag_post:
-        return redirect(u'/posts/{0}'.format(title))
+        return render_template('post.html', last_posts=methods.last_posts, post=tag_post, tags=methods.tags,
+                               top_posts=methods.top_posts(), newer_older=True)
+
     return render_template('oops.html', last_posts=methods.last_posts, top_posts=methods.top_posts(),
                            tags=methods.tags)
 
@@ -362,6 +364,7 @@ def submit_edit_post(title):
     if primary_tag == '':
         flash('Primary tag should not be left blank.')
     redirect(url_for('edit_post', title=title))
+
     count = session.query(Post).filter(Post.Title == title).\
         update({Post.Date: old_post.Date, Post.Image_Location: image_location,
                 Post.Image_Caption: request.form['image_caption'], Post.Lead: request.form['lead'],
@@ -492,8 +495,7 @@ def create_post():
         session.commit()
     except sqlalchemy.exc.SQLAlchemyError, e:
         session.rollback()
-        print e
-        return render_template('/admin/create_post.html', failure=True, error='An error occurred while saving post',
+        return render_template('/admin/create_post.html', failure=True, error=e.message, detail=e.statement,
                                tags=methods.tags, top_posts=methods.top_posts(), last_posts=methods.last_posts)
 
     # TODO: FIX: methods.email_post(request.form['title'], primary_tag, datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
