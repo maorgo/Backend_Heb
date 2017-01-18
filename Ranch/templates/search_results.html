@@ -11,25 +11,24 @@
 	<table border='0'>
 		<tr>
 			<td>
-				כותרת&nbsp;&nbsp;&nbsp;
+				<b>כותרת&nbsp;&nbsp;&nbsp;</b>
 			</td>
 			<td>
-				קטגוריה&nbsp;&nbsp;&nbsp;&nbsp;
+				<b>קטגוריה&nbsp;&nbsp;&nbsp;&nbsp;</b>
 			</td>
 			<td>
-				תאריך
+				<b>תאריך</b>
 			</td>
 		</tr>
 		{% for post in post_results %}
 		<tr>
 			<td>
-				<a href='{{ url_for("post", title=post["title"])}}'>{{ post['title'] }}</a>&nbsp;&nbsp;&nbsp;&nbsp;
+				<a href='{{ url_for("post", title=post.Title)}}'> {{post.Title}} </a>&nbsp;&nbsp;&nbsp;&nbsp;
+			<td>
+				<a href="/{{ post.Primary_Tag}}">{{ post.Primary_Tag}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
 			</td>
 			<td>
-				<a href="/{{ post['primary_tag'] }}">{{ post['primary_tag']}}</a>&nbsp;&nbsp;&nbsp;&nbsp;
-			</td>
-			<td>
-				{{post['date'].strftime('%Y-%m-%d  %H-%M')}}
+				{{post.Date}}
 			</td>
 		</tr>
 		{% endfor %}

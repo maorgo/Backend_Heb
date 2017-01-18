@@ -3,19 +3,18 @@
 # TODO: Add time to Date column @ posts table
 # TODO: Check that last_post updates every time a new post
 # TODO: Fix older / newer posts
-from time import strftime, gmtime
+# TODO: Migrate from mongo on functions: upvote, downvote, add_comment, newer
+
 import os
 import smtplib
-import uuid
 from datetime import datetime
-import pymongo
 from flask import render_template, redirect, request, url_for, send_from_directory, flash, make_response
 from werkzeug.utils import secure_filename
 from Ranch import app, DBSession
 import methods
 import settings
-from methods import posts_collection, db, tags
-from models import Comments, Post, Tag
+from methods import tags
+from models import Post, Tag
 import sqlalchemy
 import logging
 
@@ -45,21 +44,15 @@ def archive():
 
 @app.route('/about')
 def about():
-    about_p = session.query(Post).filter(Post.Title == u'אודות הבלוג' and Post.Primary_Tag == u'הודעות מערכת').first()
-    if about_p:
-        return render_template('post.html', post=about_p, last_posts=methods.last_posts, tags=methods.tags,
-                               top_posts=methods.top_posts())
-    return render_template('oops.html', reason=u'הפוסט הרצוי לא נמצא')
+    return render_template('about.html', last_posts=methods.last_posts, tags=methods.tags,
+                           top_posts=methods.top_posts())
 
 
 @app.route('/contact')
 def contact():
     # Placeholder. Should work on it.
-    # contact_me = posts_collection.find({'title': 'Contact Me'}).limit(1)[0]
-    # return render_template('post_mongo.html',post=contact_me, last_posts=methods.last_posts(),
-    # top_posts=methods.top_posts(), tags=methods.tags)
-    return render_template('contact.html', post='', last_posts=methods.last_posts, top_posts=methods.top_posts(),
-                           tags=methods.tags)
+     return render_template('contact.html', post='', last_posts=methods.last_posts, top_posts=methods.top_posts(),
+                            tags=methods.tags)
 
 
 @app.route('/<title>')
@@ -102,65 +95,63 @@ def older(post_title):
                            newer_older=True, reason=u'שגיאה בעת מציאת פוסט נוכחי.')
 
 
-@app.route('/newer/<post_title>')
-def newer(post_title):
-    current_post = session.query(Post).filter(Post.Title == post_title).first()
-    if current_post:
-        newer_post = session.query(Post).filter(current_post.Date >= Post.Date).order_by(sqlalchemy.desc(Post.Date)).first()
-        if newer_post:
-            newer_post = methods.view_add(newer_post)
-            return redirect(u'/posts/{0}'.format(newer_post.Title))
-        return render_template('oops.html', last_posts=methods.last_posts, tags=methods.tags,
-                               top_posts=methods.top_posts(),
-                               newer_older=True, reason=u'שגיאה בעת מציאת פוסט חדש יותר.')
-    return render_template('oops.html', last_posts=methods.last_posts, tags=methods.tags, top_posts=methods.top_posts(),
-                           newer_older=True, reason=u'שגיאה בעת מציאת פוסט נוכחי.')
-
-    older_post = posts_collection.find({'title': post_title}, {'primary_tag': 1, 'date': 1, 'secondary_tags': 1,
-                                                               'title': 1})
-    if older_post.count() != 1:
-        return render_template('oops.html', tags=methods.tags, last_posts=methods.last_posts(),
-                               top_posts=methods.top_posts(),
-                               reason='While pressing older, found more or less than 1, maybe conflicting titles')
-    older_post = older_post[0]
-    # new_post = posts_collection.find({'date': {'$gt': older_post['date'], 'primary_tag': older_post['primary_tag']}}
-    #                                  ).sort('date', 1).limit(1)
-    new_post = posts_collection.find({'primary_tag': older_post['primary_tag'], 'date': {'$gt': older_post['date']}}
-                                     ).sort('date', 1)
-    # return str(new_post[0]  )
-    if new_post.count() == 0:
-        new_post = posts_collection.find({'date': {'$gt': older_post['date'], 'secondary_tags':
-                                                   {'$in': older_post['secondary_tags']}}}).sort('date', 1).limit(1)
-        if new_post.count() == 0:
-            # return str(old_post['title'])
-            return post(older_post['title'])
-    return post(new_post[0]['title'])
-
-
-@app.route('/posts/<title>', methods=['POST'])
-def add_comment(title):
-    name = request.form['contactName']
-    email = request.form['contactEmail']
-    comment = request.form['contactComment']
-    # db.posts.find({ "_id" : ObjectId("5797ce3372628cf1bac24b17")}, {'comments':1, '_id': 0})
-    # session.query(Post).filter(Post.Title=title).update({})
-    posts_collection.update(
-            {'title': title},
-            {'$push':
-                {'comments':
-                    {
-                        'comment': comment,
-                        'author': name,
-                        'email': email,
-                        'upvotes': 0,
-                        'id': str(uuid.uuid4()),
-                        'comment_date': datetime.utcnow(),
-                        'reply': {}
-                    }
-                 }
-             }
-    )
-    return redirect('/posts/{0}'.format(title))
+# @app.route('/newer/<post_title>')
+# def newer(post_title):
+#     current_post = session.query(Post).filter(Post.Title == post_title).first()
+#     if current_post:
+#         newer_post = session.query(Post).filter(current_post.Date >= Post.Date).order_by(sqlalchemy.desc(Post.Date)).first()
+#         if newer_post:
+#             newer_post = methods.view_add(newer_post)
+#             return redirect(u'/posts/{0}'.format(newer_post.Title))
+#         return render_template('oops.html', last_posts=methods.last_posts, tags=methods.tags,
+#                                top_posts=methods.top_posts(),
+#                                newer_older=True, reason=u'שגיאה בעת מציאת פוסט חדש יותר.')
+#     return render_template('oops.html', last_posts=methods.last_posts, tags=methods.tags, top_posts=methods.top_posts(),
+#                            newer_older=True, reason=u'שגיאה בעת מציאת פוסט נוכחי.')
+#
+#     older_post = posts_collection.find({'title': post_title}, {'primary_tag': 1, 'date': 1, 'secondary_tags': 1,
+#                                                                'title': 1})
+#     if older_post.count() != 1:
+#         return render_template('oops.html', tags=methods.tags, last_posts=methods.last_posts(),
+#                                top_posts=methods.top_posts(),
+#                                reason='While pressing older, found more or less than 1, maybe conflicting titles')
+#     older_post = older_post[0]
+#     new_post = posts_collection.find({'primary_tag': older_post['primary_tag'], 'date': {'$gt': older_post['date']}}
+#                                      ).sort('date', 1)
+#     # return str(new_post[0]  )
+#     if new_post.count() == 0:
+#         new_post = posts_collection.find({'date': {'$gt': older_post['date'], 'secondary_tags':
+#                                                    {'$in': older_post['secondary_tags']}}}).sort('date', 1).limit(1)
+#         if new_post.count() == 0:
+#             # return str(old_post['title'])
+#             return post(older_post['title'])
+#     return post(new_post[0]['title'])
+#
+#
+# @app.route('/posts/<title>', methods=['POST'])
+# def add_comment(title):
+#     name = request.form['contactName']
+#     email = request.form['contactEmail']
+#     comment = request.form['contactComment']
+#     # db.posts.find({ "_id" : ObjectId("5797ce3372628cf1bac24b17")}, {'comments':1, '_id': 0})
+#     # session.query(Post).filter(Post.Title=title).update({})
+#     posts_collection.update(
+#             {'title': title},
+#             {'$push':
+#                 {'comments':
+#                     {
+#                         'comment': comment,
+#                         'author': name,
+#                         'email': email,
+#                         'upvotes': 0,
+#                         'id': str(uuid.uuid4()),
+#                         'comment_date': datetime.utcnow(),
+#                         'reply': {}
+#                     }
+#                  }
+#              }
+#     )
+#     return redirect('/posts/{0}'.format(title))
 
 
 @app.route('/done', methods=['POST'])
@@ -201,32 +192,20 @@ def search():
     # Get the searched word
     keyword = unicode(request.form['search-form'])
     # Search in titles, play with case sensitivity
-    title_results = session.query(Post).filter(sqlalchemy.or_(Post.Title == keyword, Post.Title == keyword.lower(),
-                                                              Post.Title == keyword.upper())).\
+    title_results = session.query(Post).filter(
+        sqlalchemy.or_(Post.Title == keyword, Post.Title == keyword.lower(), Post.Title == keyword.upper())).\
         order_by(sqlalchemy.desc(Post.Date)).all()
-    t = session.query(Post).filter(Post.Title == keyword).all()
-    print t
-    try:
-        return unicode(title_results)
-    except:
-        return str(title_results)
-    # title_results = db.posts.find({'$or': [{"title": {'$regex': '.*' + keyword + '.*'}},
-    #                                        {'title': {'$regex': '.*' + keyword.lower() + '.*'}},
-    #                                        {'title': {'$regex': '.*' + keyword.upper() + '.*'}}]})
+
     # Search in body fields, play with case sensitivity
-    body_results = session.query(Post).filter(sqlalchemy.or_(Post.Text == keyword, Post.Text == keyword.lower(),
-                                                             Post.Text == keyword.upper())).\
+    body_results = session.query(Post).filter(
+        sqlalchemy.or_(Post.Text == keyword, Post.Text == keyword.lower(), Post.Text == keyword.upper())).\
         order_by(sqlalchemy.desc(Post.Date)).all()
-    # body_results = db.posts.find({'$or': [{"text": {'$regex': '.*' + keyword + '.*'}},
-    #                              {"text": {'$regex': '.*' + keyword.lower() + '.*'}},
-    #                              {"text": {'$regex': '.*' + keyword.upper() + '.*'}}]})
+
     lead_results = session.query(Post).filter(sqlalchemy.or_(Post.Lead == keyword, Post.Lead == keyword.lower(),
                                                              Post.Lead == keyword.upper())).\
         order_by(sqlalchemy.desc(Post.Date)).all()
     # Search in lead fields, play with case sensitivity
-    # lead_results = db.posts.find({'$or': [{"lead": {'$regex': '.*' + keyword + '.*'}},
-    #                                       {"lead": {'$regex': '.*' + keyword.upper() + '.*'}},
-    #                                       {"lead": {'$regex': '.*' + keyword.lower() + '.*'}}]})
+
     # Collect all results into one list
     for title in title_results:
         if title not in post_results:
@@ -240,9 +219,9 @@ def search():
     # Check if there are results. If so, return them
     if len(post_results) == 0:
         return render_template('search_results.html', keyword=keyword, no_results=True,
-                               last_posts=methods.last_posts(), top_posts=methods.top_posts(), tags=methods.tags)
+                               last_posts=methods.last_posts, top_posts=methods.top_posts(), tags=methods.tags)
     return render_template('search_results.html', keyword=keyword, post_results=post_results,
-                           last_posts=methods.last_posts(), top_posts=methods.top_posts(), tags=methods.tags)
+                           last_posts=methods.last_posts, top_posts=methods.top_posts(), tags=methods.tags)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -305,7 +284,6 @@ def admin():
 @app.route('/admin/posts')
 def posts_admin():
     # Find all posts to show at the admin panel
-    # all_posts = posts_collection.find().sort('date', pymongo.DESCENDING)
     all_posts = session.query(Post).order_by(sqlalchemy.desc(Post.Date)).all()
     return render_template('admin/posts_list.html', tags=methods.tags, last_posts=methods.last_posts,
                            top_posts=methods.top_posts(), all_posts=all_posts)
@@ -322,7 +300,6 @@ def tags_admin(message=None):
 @app.route('/admin/edit/<title>')
 def edit_post(title):
     # Find the post desired for edit
-    # post_to_edit = posts_collection.find({'title': title})[0]
     post_to_edit = session.query(Post).filter(Post.Title == title).first()
     return render_template('admin/edit_post.html', post=post_to_edit, tags=methods.tags,
                            last_posts=methods.last_posts, top_posts=methods.top_posts())
@@ -333,7 +310,6 @@ def submit_edit_post(title):
     data = {}
     primary_tag = ''
     secondary_tag = []
-    # old_post = posts_collection.find({'title': title})[0]
     old_post = session.query(Post).filter(Post.Title == title).first()
     # Collect all tags that were chosen into two lists (primary, secondary)
     for i in request.form:
@@ -382,45 +358,16 @@ def submit_edit_post(title):
         return render_template('oops.html', reason='Too many were updated: {0}'.format(count, tags=methods.tags,
                                                                                        top_posts=methods.top_posts(),
                                                                                        last_posts=methods.last_posts))
-    # data.update({'author': 'Maor Goaz', 'date': old_post['date']})  # .strftime('%Y-%m-%d %H:%M:%S')
-    # # Data that came from the form itself
-    # data.update({'update_date': datetime.utcnow(),
-    #              'img_location': image_location,
-    #              'img_caption': request.form['image_caption'],
-    #              'lead': request.form['lead'],
-    #              'text': request.form['text'],
-    #              'title': request.form['title'],
-    #              'primary_tag': primary_tag,
-    #              'secondary_tags': secondary_tag,
-    #              'comments': [],
-    #              'views': old_post['views']
-    #              })
-    # # Update the new post
-    # insert_post = posts_collection.update({'title': title}, data)
-    # Check update results
-    # if insert_post['updatedExisting'] and insert_post['nModified'] == 1:
-    #     new_post = posts_collection.find({'title': request.form['title']})[0]
-    #     return render_template('/admin/edit_post.html', post=new_post, tags=methods.tags,
-    #                            last_posts=methods.last_posts(), top_posts=methods.top_posts(), successful=True)
-    # elif insert_post['updatedExisting'] and insert_post['nModified'] > 1:
-    #     return render_template('oops.html', reason='Too many were updated: {0}'
-    #                            .format(insert_post['nModified'], tags=methods.tags, top_posts=methods.top_posts(),
-    #                                    last_posts=methods.last_posts()))
-    # else:
-    #     return render_template('oops.html', reason=str(insert_post), tags=methods.tags, top_posts=methods.top_posts(),
-    #                            last_posts=methods.last_posts())
 
 
 @app.route('/admin/posts', methods=['POST'])
 def delete_post():
     # For all posts that were selected, delete them
     for title in request.form:
-        # deleted = posts_collection.delete_one({'title': title})
         deleted = session.query(Post).filter(Post.Title == title).delete()
         if deleted != 1:
             return render_template('oops.html', last_posts=methods.last_posts, top_posts=methods.top_posts(),
                                    reason='Deleted {0} posts'.format(deleted.deleted_count), tags=methods.tags)
-    # all_posts = posts_collection.find().sort('date', pymongo.DESCENDING)
     all_posts = session.query(Post).order_by(sqlalchemy.desc(Post.Date)).all()
     return render_template('/admin/posts_list.html', tags=methods.tags, last_posts=methods.last_posts,
                            top_posts=methods.top_posts(), all_posts=all_posts, posts_number=all_posts.count())
@@ -503,24 +450,24 @@ def create_post():
                            last_posts=methods.last_posts)
 
 
-@app.route('/posts/<title>/<comment_id>/upvote')
-def upvote(comment_id, title):
-    up = posts_collection.update({'title': title, 'comments.id': comment_id}, {'$inc': {'comments.$.upvotes': 1}})
-    if up['updatedExisting']:
-        return redirect('/posts/' + title)
-    else:
-        return render_template('oops.html', reason='Couldn\'t upvote the comment. Sorry.', tags=methods.tags,
-                               top_posts=methods.top_posts(), last_posts=methods.last_posts)
-
-
-@app.route('/posts/<title>/<comment_id>/downvote')
-def downvote(comment_id, title):
-    down = posts_collection.update({'title': title, 'comments.id': comment_id}, {'$inc': {'comments.$.upvotes': -1}})
-    if down['updatedExisting']:
-        return redirect('/posts/' + title)
-    else:
-        return render_template('oops.html', reason='Couldn\'t downvote the comment. Sorry.', tags=methods.tags,
-                               top_posts=methods.top_posts(), last_posts=methods.last_posts)
+# @app.route('/posts/<title>/<comment_id>/upvote')
+# def upvote(comment_id, title):
+#     up = posts_collection.update({'title': title, 'comments.id': comment_id}, {'$inc': {'comments.$.upvotes': 1}})
+#     if up['updatedExisting']:
+#         return redirect('/posts/' + title)
+#     else:
+#         return render_template('oops.html', reason='Couldn\'t upvote the comment. Sorry.', tags=methods.tags,
+#                                top_posts=methods.top_posts(), last_posts=methods.last_posts)
+#
+#
+# @app.route('/posts/<title>/<comment_id>/downvote')
+# def downvote(comment_id, title):
+#     down = posts_collection.update({'title': title, 'comments.id': comment_id}, {'$inc': {'comments.$.upvotes': -1}})
+#     if down['updatedExisting']:
+#         return redirect('/posts/' + title)
+#     else:
+#         return render_template('oops.html', reason='Couldn\'t downvote the comment. Sorry.', tags=methods.tags,
+#                                top_posts=methods.top_posts(), last_posts=methods.last_posts)
 
 
 @app.route('/subscribe', methods=['GET', 'POST'])

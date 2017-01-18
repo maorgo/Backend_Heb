@@ -15,16 +15,6 @@ import sqlalchemy
 conf = settings.Configure()
 session = DBSession()
 
-try:
-    client = pymongo.MongoClient(host=conf.DB_URL, port=27017, socketTimeoutMS=10000, connectTimeoutMS=10000)
-except mongo_errors.ConnectionFailure, e:
-    # Create error page here
-    sys.exit(1)
-
-db = client.blog
-posts_collection = db.posts
-
-
 def view_add(post):
     post.Views += 1
     return post
