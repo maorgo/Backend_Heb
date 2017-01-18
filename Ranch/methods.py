@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import smtplib
-import sys
-import pymongo
-from pymongo import errors as mongo_errors
 import psycopg2
-from time import strftime, gmtime
 import settings
 from Ranch import DBSession
 from models import Tag, Post

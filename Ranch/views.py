@@ -16,7 +16,6 @@ import settings
 from methods import tags
 from models import Post, Tag
 import sqlalchemy
-import logging
 
 conf = settings.Configure()
 session = DBSession()
