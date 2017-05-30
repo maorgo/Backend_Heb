@@ -11,6 +11,7 @@ logging.basicConfig(filename=conf.LOG_NAME, level=conf.LOG_LEVEL, format='%(asct
 logging.debug('*** Starting {0}'.format(conf.BLOG_NAME))
 app = Flask(__name__)
 
+
 app.config["SQLALCHEMY_DATABASE_URI"] = conf.database_connection_string
 app.config["SECRET_KEY"] = conf.secret_key
 db = SQLAlchemy(app)

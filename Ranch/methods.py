@@ -4,16 +4,12 @@ import smtplib
 import psycopg2
 import settings
 from Ranch import DBSession
-from models import Tag, Post
+from models import Tag, Post, Subscription
 import logging
 import sqlalchemy
 
 conf = settings.Configure()
 session = DBSession()
-
-def view_add(post):
-    post.Views += 1
-    return post
 
 
 def add_post(author, title, lead, text, img_loc, img_cap, prim_tag, second_tag):
@@ -41,25 +37,24 @@ def top_posts():
 
 
 def email_post(title, primary_tag, date):
-    with open('C:\Users\goas\Desktop\personal\Backend_Heb\Ranch\MAILING_LIST', 'r') as f:
-        mailing_list = f.read().split('\n')
-        if not mailing_list:
-            return False
-        email_user = 'goaz.maor'
-        email_password = 'heuflxtukdyjckfb'
-        origin = 'blog@BackendRanch.dom'
-        to = mailing_list
-        subject = 'New Post From BackendRanch'
-        text = u'Hello, \nthe post \'{0}\' was published at {1} and is regarding {2}!\nYou should really check ' \
-               u'it out!\n{3}\n\nBackendRanch'.format(title, date, primary_tag, conf.POST_LINK + title)
-        message = """From: %s\nTo: %s\nSubject: %s\n\n%s
-        """ % (origin, ", ".join(to), subject, text)
-        server = smtplib.SMTP("smtp.gmail.com", 587)
-        server.ehlo()
-        server.starttls()
-        server.login(email_user, email_password)
-        server.sendmail(origin, to, message)
-        server.close()
+    subscribers = [i[0] for i in session.query(Subscription.email).all()]
+
+    email_user = 'goaz.maor'
+    email_password = 'ioqgnvyovfnppstb'
+    origin = 'blog@BackendRanch.dom'
+    bcc = subscribers
+    subject = 'New Post From BackendRanch'
+    text = u'Hello, \nthe post \'{0}\' was published at {1} and is regarding {2}!\nYou should really check ' \
+           u'it out!\n{3}\n\nBackendRanch'.format(title, date, primary_tag, conf.POST_LINK + title)
+    message = """From: %s\nBcc: %s\nSubject: %s\n\n%s
+    """ % (origin, ", ".join(bcc), subject, text)
+
+    server = smtplib.SMTP("smtp.gmail.com", 587)
+    server.ehlo()
+    server.starttls()
+    server.login(email_user, email_password)
+    server.sendmail(origin, bcc, message)
+    server.close()
 
 tags = reload_tags()
 last_posts = last_posts()

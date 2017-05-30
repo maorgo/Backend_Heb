@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-# TODO: Add author column for posts, now it's hardcoded as Maor Goaz
-# TODO: Add time to Date column @ posts table
-# TODO: Check that last_post updates every time a new post
-# TODO: Fix older / newer posts
-# TODO: Migrate from mongo on functions: upvote, downvote, add_comment, newer
+# todo: Add admin button to those who are authenticated as admins
+# todo: Subsribers' email: fix bcc issue
 
 import os
 import smtplib
+import uuid
 from datetime import datetime
 from flask import render_template, redirect, request, url_for, send_from_directory, flash, make_response
 from werkzeug.utils import secure_filename
@@ -14,7 +12,7 @@ from Ranch import app, DBSession
 import methods
 import settings
 from methods import tags
-from models import Post, Tag
+from models import Post, Tag, Comment, Subscription
 import sqlalchemy
 
 conf = settings.Configure()
@@ -23,22 +21,20 @@ session = DBSession()
 
 @app.route('/')
 def index():
-    # add = methods.add_post(author=u'מאור גואז', img_cap=u'זה ההסבר לתמונה', img_loc='/112111', prim_tag=u'הודעות מערכת',
-    #                        text=u'כאן נכנס הטקסט', lead=u'זו ההקדמה', title=u'אודות הבלוג', second_tag='Python')
-
     last_post = session.query(Post).filter(Post.Primary_Tag != 'System Messages').\
                 order_by(sqlalchemy.desc(Post.Date)).limit(1).first()
     if not last_post:
         return render_template('oops.html', tags=tags, last_posts=methods.last_posts, top_posts=methods.top_posts())
+    comments = session.query(Comment).filter(Comment.PostTitle == last_post.Title).all()
     return render_template('post.html', post=last_post, last_posts=methods.last_posts, tags=methods.tags,
-                           top_posts=methods.top_posts(), newer_older=True)
+                           top_posts=methods.top_posts(), newer_older=True, comments=comments)
 
 
 @app.route('/archive')
 def archive():
     posts = session.query(Post).filter(Post.Primary_Tag != 'System Messages').order_by(sqlalchemy.desc(Post.Date)).all()
     return render_template('archive.html', posts=posts, last_posts=methods.last_posts, tags=methods.tags,
-                               top_posts=methods.top_posts())
+                           top_posts=methods.top_posts())
 
 
 @app.route('/about')
@@ -71,8 +67,10 @@ def post(title):
     if blog_post:
         blog_post.Views += 1
         session.commit()
+        comments = session.query(Comment).filter(Comment.PostTitle == title).all()
+
         return render_template('post.html', last_posts=methods.last_posts, post=blog_post, tags=methods.tags,
-                               top_posts=methods.top_posts(), newer_older=True)
+                               top_posts=methods.top_posts(), newer_older=True, comments=comments)
     else:
         return render_template('oops.html', last_posts=methods.last_posts, top_posts=methods.top_posts(),
                                tags=methods.tags)
@@ -82,75 +80,50 @@ def post(title):
 def older(post_title):
     current_post = session.query(Post).filter(Post.Title == post_title).first()
     if current_post:
-
-        older_post = session.query(Post).filter(Post.Date <= current_post.Date).order_by(sqlalchemy.desc(Post.Date)).first()
+        older_post = session.query(Post).filter(Post.Date < current_post.Date).order_by(sqlalchemy.desc(Post.Date)).first()
         if older_post:
-            older_post = methods.view_add(older_post)
+            older_post.Views += 1
             return redirect(u'/posts/{0}'.format(older_post.Title))
-        return render_template('oops.html', last_posts=methods.last_posts, tags=methods.tags,
-                               top_posts=methods.top_posts(),
-                               newer_older=True, reason=u'שגיאה בעת מציאת פוסט ישן יותר.')
+        return redirect(u'/posts/{0}'.format(current_post.Title))
+        # return render_template('oops.html', last_posts=methods.last_posts, tags=methods.tags,
+        #                        top_posts=methods.top_posts(),
+        #                        newer_older=True, reason=u'שגיאה בעת מציאת פוסט ישן יותר.')
     return render_template('oops.html', last_posts=methods.last_posts, tags=methods.tags, top_posts=methods.top_posts(),
                            newer_older=True, reason=u'שגיאה בעת מציאת פוסט נוכחי.')
 
 
-# @app.route('/newer/<post_title>')
-# def newer(post_title):
-#     current_post = session.query(Post).filter(Post.Title == post_title).first()
-#     if current_post:
-#         newer_post = session.query(Post).filter(current_post.Date >= Post.Date).order_by(sqlalchemy.desc(Post.Date)).first()
-#         if newer_post:
-#             newer_post = methods.view_add(newer_post)
-#             return redirect(u'/posts/{0}'.format(newer_post.Title))
-#         return render_template('oops.html', last_posts=methods.last_posts, tags=methods.tags,
-#                                top_posts=methods.top_posts(),
-#                                newer_older=True, reason=u'שגיאה בעת מציאת פוסט חדש יותר.')
-#     return render_template('oops.html', last_posts=methods.last_posts, tags=methods.tags, top_posts=methods.top_posts(),
-#                            newer_older=True, reason=u'שגיאה בעת מציאת פוסט נוכחי.')
-#
-#     older_post = posts_collection.find({'title': post_title}, {'primary_tag': 1, 'date': 1, 'secondary_tags': 1,
-#                                                                'title': 1})
-#     if older_post.count() != 1:
-#         return render_template('oops.html', tags=methods.tags, last_posts=methods.last_posts(),
-#                                top_posts=methods.top_posts(),
-#                                reason='While pressing older, found more or less than 1, maybe conflicting titles')
-#     older_post = older_post[0]
-#     new_post = posts_collection.find({'primary_tag': older_post['primary_tag'], 'date': {'$gt': older_post['date']}}
-#                                      ).sort('date', 1)
-#     # return str(new_post[0]  )
-#     if new_post.count() == 0:
-#         new_post = posts_collection.find({'date': {'$gt': older_post['date'], 'secondary_tags':
-#                                                    {'$in': older_post['secondary_tags']}}}).sort('date', 1).limit(1)
-#         if new_post.count() == 0:
-#             # return str(old_post['title'])
-#             return post(older_post['title'])
-#     return post(new_post[0]['title'])
-#
-#
-# @app.route('/posts/<title>', methods=['POST'])
-# def add_comment(title):
-#     name = request.form['contactName']
-#     email = request.form['contactEmail']
-#     comment = request.form['contactComment']
-#     # db.posts.find({ "_id" : ObjectId("5797ce3372628cf1bac24b17")}, {'comments':1, '_id': 0})
-#     # session.query(Post).filter(Post.Title=title).update({})
-#     posts_collection.update(
-#             {'title': title},
-#             {'$push':
-#                 {'comments':
-#                     {
-#                         'comment': comment,
-#                         'author': name,
-#                         'email': email,
-#                         'upvotes': 0,
-#                         'id': str(uuid.uuid4()),
-#                         'comment_date': datetime.utcnow(),
-#                         'reply': {}
-#                     }
-#                  }
-#              }
-#     )
-#     return redirect('/posts/{0}'.format(title))
+@app.route('/newer/<post_title>')
+def newer(post_title):
+    current_post = session.query(Post).filter(Post.Title == post_title).first()
+    if current_post:
+        newer_post = session.query(Post).filter(Post.Date > current_post.Date).order_by(sqlalchemy.desc(Post.Date)).first()
+        if newer_post:
+            newer_post.Views += 1
+            return redirect(u'/posts/{0}'.format(newer_post.Title))
+        else:
+            return redirect(u'/posts/{0}'.format(post_title))
+        # return render_template('oops.html', last_posts=methods.last_posts, tags=methods.tags,
+        #                        top_posts=methods.top_posts(),
+        #                        newer_older=True, reason=u'שגיאה בעת מציאת פוסט חדש יותר.')
+    return render_template('oops.html', last_posts=methods.last_posts, tags=methods.tags, top_posts=methods.top_posts(),
+                           newer_older=True, reason=u'שגיאה בעת מציאת פוסט נוכחי.')
+
+
+@app.route('/posts/<title>', methods=['POST'])
+def add_comment(title):
+    name = unicode(request.form['contactName'])
+    email = unicode(request.form['contactEmail'])
+    comment = unicode(request.form['contactComment'])
+    title = unicode(title)
+    if name != '' and comment != '' and title != '' and name and comment and title:
+        new_comment = Comment(post_title=title, name=name, comment=comment, comment_id=uuid.uuid4().hex,
+                              comment_to=None, email=email, date=datetime.utcnow())
+        session.add(new_comment)
+        session.commit()
+        return redirect(u'/posts/{0}'.format(title))
+    else:
+        return render_template('oops.html', top_posts=methods.top_posts(), last_posts=methods.last_posts(),
+                               tags=methods.tags, reason=u'התרחשה בעיה עם התגובה. מצטערים.')
 
 
 @app.route('/done', methods=['POST'])
@@ -161,14 +134,12 @@ def contact_me():
     # TO = recipient if type(recipient) is list else [recipient]
     to = ['{0}'.format(conf.RECIEVE_ADDRESS)]
     subject = 'You have a message from {0} blog.'.format(conf.BLOG_NAME)
-
     # Prepare actual message
     # message = """From: %s\nTo: %s\nSubject: %s\n\n%s
     # """ % (request.form['contactName'], ", ".join(to), subject, text)
-    text = 'The following message sent from {0} that can be reached back at {1}:\n{2}'.format(
+    text = u'The following message sent from {0} that can be reached back at {1}:\n{2}'.format(
             request.form['contactName'], request.form['contactEmail'], request.form['contactComment'])
-
-    message = """From: %s\nTo: %s\nSubject: %s\n\n%s
+    message = u"""From: %s\nTo: %s\nSubject: %s\n\n%s
     """ % (request.form['contactEmail'], ", ".join(to), subject, text)
     try:
         server = smtplib.SMTP("smtp.gmail.com", 587)
@@ -177,7 +148,6 @@ def contact_me():
         server.login(email_user, email_password)
         server.sendmail(origin, to, message)
         server.close()
-
         return render_template('contact.html', success=True, last_posts=methods.last_posts(),
                                top_posts=methods.top_posts(), tags=methods.tags, post='')
     except Exception, exception:
@@ -192,18 +162,31 @@ def search():
     keyword = unicode(request.form['search-form'])
     # Search in titles, play with case sensitivity
     title_results = session.query(Post).filter(
-        sqlalchemy.or_(Post.Title == keyword, Post.Title == keyword.lower(), Post.Title == keyword.upper())).\
-        order_by(sqlalchemy.desc(Post.Date)).all()
+        sqlalchemy.or_(Post.Title.like(u'%{0}%'.format(keyword)),
+                       Post.Title.like(u'%{0}%'.format(keyword.lower())),
+                       Post.Title.like(u'%{0}%'.format(keyword.upper()))))\
+        .order_by(sqlalchemy.desc(Post.Date)).all()
 
     # Search in body fields, play with case sensitivity
     body_results = session.query(Post).filter(
-        sqlalchemy.or_(Post.Text == keyword, Post.Text == keyword.lower(), Post.Text == keyword.upper())).\
-        order_by(sqlalchemy.desc(Post.Date)).all()
+        sqlalchemy.or_(Post.Text.like(u'%{0}%'.format(keyword)),
+                       Post.Text.like(u'%{0}%'.format(keyword.lower())),
+                       Post.Text.like(u'%{0}%'.format(keyword.upper()))))\
+        .order_by(sqlalchemy.desc(Post.Date)).all()
 
-    lead_results = session.query(Post).filter(sqlalchemy.or_(Post.Lead == keyword, Post.Lead == keyword.lower(),
-                                                             Post.Lead == keyword.upper())).\
-        order_by(sqlalchemy.desc(Post.Date)).all()
     # Search in lead fields, play with case sensitivity
+    lead_results = session.query(Post).filter(
+        sqlalchemy.or_(Post.Lead.like(u'%{0}%'.format(keyword)),
+                       Post.Lead.like(u'%{0}%'.format(keyword.lower())),
+                       Post.Lead.like(u'%{0}%'.format(keyword.upper()))))\
+        .order_by(sqlalchemy.desc(Post.Date)).all()
+
+    # Search tags
+    tag_results = session.query(Post).filter(
+        sqlalchemy.or_(Post.Primary_Tag.like(u'%{0}%'.format(keyword)),
+                       Post.Primary_Tag.like(u'%{0}%'.format(keyword.lower())),
+                       Post.Primary_Tag.like(u'%{0}%'.format(keyword.upper()))))\
+        .order_by(sqlalchemy.desc(Post.Date)).all()
 
     # Collect all results into one list
     for title in title_results:
@@ -215,6 +198,10 @@ def search():
     for sentence in body_results:
         if sentence not in post_results:
             post_results.append(sentence)
+    for each_tag in tag_results:
+        if each_tag not in post_results:
+            post_results.append(each_tag)
+
     # Check if there are results. If so, return them
     if len(post_results) == 0:
         return render_template('search_results.html', keyword=keyword, no_results=True,
@@ -366,10 +353,11 @@ def delete_post():
         deleted = session.query(Post).filter(Post.Title == title).delete()
         if deleted != 1:
             return render_template('oops.html', last_posts=methods.last_posts, top_posts=methods.top_posts(),
-                                   reason='Deleted {0} posts'.format(deleted.deleted_count), tags=methods.tags)
+                                   reason='Deleted {0} posts'.format(deleted), tags=methods.tags)
     all_posts = session.query(Post).order_by(sqlalchemy.desc(Post.Date)).all()
     return render_template('/admin/posts_list.html', tags=methods.tags, last_posts=methods.last_posts,
-                           top_posts=methods.top_posts(), all_posts=all_posts, posts_number=all_posts.count())
+                           top_posts=methods.top_posts(), all_posts=all_posts,
+                           posts_number=sqlalchemy.func.count(all_posts))
 
 
 # Change to app.route('/admin/tags', methods=['DELETE'])
@@ -415,14 +403,22 @@ def create_post():
         return render_template('/admin/create_post.html', tags=methods.tags, top_posts=methods.top_posts(),
                                last_posts=methods.last_posts)
     image_location = ''
+    # todo: add path verification for the image uploaded (don't allow ../ and such)
     if 'image_location' in request.files.keys():
         image = request.files['image_location']
         filename = secure_filename(image.filename)
+        image_location = '/static/pictures/' + filename
+
+        if session.query(Post).filter(Post.Image_Location == image_location).first():
+            return render_template('/admin/create_post.html', failure=True, error=u'שם הקובץ קיים במערכת',
+                                   detail=u'שם הקובץ: {0}'.format(image_location),
+                                   tags=methods.tags, top_posts=methods.top_posts(), last_posts=methods.last_posts)
+        image = request.files['image_location']
+
         if filename.split('.')[-1] in conf.ALLOWED_EXTENSIONS:
             image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            image_location = '/static/pictures/' + filename
         else:
-            return render_template('/admin/create_post.html', failure=True, error='סוג הקובץ לא מאושר',
+            return render_template('/admin/create_post.html', failure=True, error=u'סוג הקובץ לא מאושר',
                                    tags=methods.tags, top_posts=methods.top_posts(), last_posts=methods.last_posts)
 
     primary_tag = ''
@@ -433,6 +429,7 @@ def create_post():
             primary_tag = i.split('_')[-1]
         elif 'secondary_tag_' in i:
                 secondary_tag.append(i.split('_')[-1])
+
     new_post = Post(author='מאור גואז', date=datetime.utcnow(), image_location=image_location,
                     image_caption=request.form['image_caption'], lead=request.form['lead'], text=request.form['text'],
                     title=request.form['title'], primary_tag=primary_tag, secondary_tag=secondary_tag)
@@ -445,22 +442,29 @@ def create_post():
                                tags=methods.tags, top_posts=methods.top_posts(), last_posts=methods.last_posts)
 
     # TODO: FIX: methods.email_post(request.form['title'], primary_tag, datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
+    methods.email_post(request.form['title'], primary_tag, datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S'))
     return render_template('/admin/create_post.html', successful=True, tags=methods.tags, top_posts=methods.top_posts(),
                            last_posts=methods.last_posts)
 
 
-# @app.route('/posts/<title>/<comment_id>/upvote')
-# def upvote(comment_id, title):
-#     up = posts_collection.update({'title': title, 'comments.id': comment_id}, {'$inc': {'comments.$.upvotes': 1}})
-#     if up['updatedExisting']:
-#         return redirect('/posts/' + title)
-#     else:
-#         return render_template('oops.html', reason='Couldn\'t upvote the comment. Sorry.', tags=methods.tags,
-#                                top_posts=methods.top_posts(), last_posts=methods.last_posts)
-#
-#
-# @app.route('/posts/<title>/<comment_id>/downvote')
-# def downvote(comment_id, title):
+@app.route('/posts/<title>/<comment_id>/upvote')
+def upvote(comment_id, title):
+    comment = session.query(Comment).filter(Comment.CommentID == comment_id).first()
+    comment.CommentVotes += 1
+    return redirect('/posts/' + title)
+    # up = posts_collection.update({'title': title, 'comments.id': comment_id}, {'$inc': {'comments.$.upvotes': 1}})
+    # if up['updatedExisting']:
+    #     return redirect('/posts/' + title)
+    # else:
+    #     return render_template('oops.html', reason='Couldn\'t upvote the comment. Sorry.', tags=methods.tags,
+    #                            top_posts=methods.top_posts(), last_posts=methods.last_posts)
+
+
+@app.route('/posts/<title>/<comment_id>/downvote')
+def downvote(comment_id, title):
+    comment = session.query(Comment).filter(Comment.CommentID == comment_id).first()
+    comment.CommentVotes -= 1
+    return redirect('/posts/' + title)
 #     down = posts_collection.update({'title': title, 'comments.id': comment_id}, {'$inc': {'comments.$.upvotes': -1}})
 #     if down['updatedExisting']:
 #         return redirect('/posts/' + title)
@@ -478,19 +482,21 @@ def subscribe():
         if request.form['email']:
             email = request.form['email']
         else:
-            return render_template('subscribe.html', message='Received empty email address.',
-                                   top_posts=methods.top_posts(), last_posts=methods.last_posts(), tags=methods.tags)
-        if '@' in email and '.' in email:
+            return render_template('subscribe.html', message=u'הוכנסה כתובת ריקה.',
+                                   top_posts=methods.top_posts(), last_posts=methods.last_posts, tags=methods.tags)
+        # if '@' in email and '.' in email and ['<', '>'] not in email:
+        if all(x in email for x in ['@', '.']) and not any(x in email for x in ['<', '>', '!', '?']):
             # process
-            with open('MAILING_LIST', 'r') as f:
-                if email in f.read().split('\n'):
-                    return render_template('subscribe.html', message='Email already exists in the system.',
-                                           top_posts=methods.top_posts(), last_posts=methods.last_posts(),
-                                           tags=methods.tags)
-            with open('MAILING_LIST', 'a') as f:
-                f.write('{0}\n'.format(email))
-            return render_template('subscribe.html', success_message='Email was successfully registered.',
-                                   top_posts=methods.top_posts(), last_posts=methods.last_posts(), tags=methods.tags)
+            # with open('MAILING_LIST', 'r') as f:
+            #     if email in f.read().split('\n'):
+            email_is_exists = session.query(Subscription).filter(Subscription.email == email).first()
+            if email_is_exists:
+                return render_template('subscribe.html', message=u'הכתובת כבר קיימת במערכת.',
+                                       top_posts=methods.top_posts(), last_posts=methods.last_posts, tags=methods.tags)
+            session.add(Subscription(email))
+            session.commit()
+            return render_template('subscribe.html', success_message=u'תודה, ההרשמה בוצעה בהצלחה.',
+                                   top_posts=methods.top_posts(), last_posts=methods.last_posts, tags=methods.tags)
         else:
-            return render_template('subscribe.html', message='Wrong email convention.', top_posts=methods.top_posts(),
-                                   last_posts=methods.last_posts(), tags=methods.tags)
+            return render_template('subscribe.html', message=u'פורמט דוא"ל שגוי.', top_posts=methods.top_posts(),
+                                   last_posts=methods.last_posts, tags=methods.tags)
