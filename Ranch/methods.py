@@ -56,5 +56,7 @@ def email_post(title, primary_tag, date):
     server.sendmail(origin, bcc, message)
     server.close()
 
-tags = reload_tags()
-last_posts = last_posts()
+# tags = reload_tags()
+tags = [1,2]
+last_posts = [1,2]
+# last_posts = last_posts()
