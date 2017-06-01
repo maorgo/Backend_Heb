@@ -404,6 +404,7 @@ def create_post():
                                last_posts=methods.last_posts)
     image_location = ''
     # todo: add path verification for the image uploaded (don't allow ../ and such)
+    # todo: if '../' in path: return?
     if 'image_location' in request.files.keys():
         image = request.files['image_location']
         filename = secure_filename(image.filename)
