@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import settings
@@ -12,7 +14,8 @@ logging.debug('*** Starting {0}'.format(conf.BLOG_NAME))
 app = Flask(__name__)
 
 
-app.config["SQLALCHEMY_DATABASE_URI"] = conf.database_connection_string
+# app.config["SQLALCHEMY_DATABASE_URI"] = conf.database_connection_string
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config["SECRET_KEY"] = conf.secret_key
 db = SQLAlchemy(app)
 
