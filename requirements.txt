@@ -1,4 +1,5 @@
-flask.ext.script
+flask_migrate==2.0.1
+flask_script==2.0.5
 Flask==0.10.1
 Flask-Mobility==0.1.1
 Flask-SQLAlchemy==2.1
