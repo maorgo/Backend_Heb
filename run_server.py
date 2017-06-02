@@ -27,15 +27,8 @@ BANNED_USERS = []
 POST_LINK = conf.POST_LINK
 
 
-@app.before_request
-def limit_remote_addr():
-    for user in conf.BANNED_USERS:
-        if request.remote_addr in user[0]:
-            abort(403)
-
-
 if __name__ == "__main__":
     try:
-        app.run(host=conf.BLOG_URL, port=4000)
+        app.run(port=4000)
     except Exception, e:
         print "Exception caught: {0}".format(e)
