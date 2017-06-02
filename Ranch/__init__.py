@@ -15,9 +15,13 @@ app = Flask(__name__)
 
 
 # app.config["SQLALCHEMY_DATABASE_URI"] = conf.database_connection_string
+app.logger.info('myLogger: setting 1')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.logger.info('myLogger: setting 2')
 app.config["SECRET_KEY"] = conf.secret_key
+app.logger.info('myLogger: setting 3')
 db = SQLAlchemy(app)
+app.logger.info('myLogger: setting 4')
 
 DBSession = sessionmaker(bind=engine)
 

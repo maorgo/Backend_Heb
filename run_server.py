@@ -11,9 +11,14 @@
 """
 
 import os
+
+import sys
+
 from Ranch import app
 import Ranch.settings
 from flask import Flask, request, abort
+import logging
+
 
 conf = Ranch.settings.Configure()
 
@@ -28,7 +33,13 @@ POST_LINK = conf.POST_LINK
 
 
 if __name__ == "__main__":
+    app.logger.addHandler(logging.StreamHandler(sys.stdout))
+    app.logger.setLevel(logging.INFO)
+
     try:
+        app.logger.info('myLogger: Attempting to start app')
         app.run()
+        app.logger.info('myLogger: Finished starting the app')
     except Exception, e:
+        app.logger.info('myLogger: Exception Caught: {0}'.format(e))
         print "Exception caught: {0}".format(e)
