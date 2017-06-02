@@ -29,6 +29,6 @@ POST_LINK = conf.POST_LINK
 
 if __name__ == "__main__":
     try:
-        app.run(port=4000)
+        app.run()
     except Exception, e:
         print "Exception caught: {0}".format(e)
