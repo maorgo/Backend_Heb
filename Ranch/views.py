@@ -21,17 +21,16 @@ session = DBSession()
 
 @app.route('/')
 def index():
-    print 'This had started!'
-    app.logger.info('This had started! 1')
+    print 'This had started 1'
     last_post = session.query(Post).filter(Post.Primary_Tag != 'System Messages').\
                 order_by(sqlalchemy.desc(Post.Date)).limit(1).first()
-    app.logger.info('This had started! 2')
+    print 'This had started 2'
     if not last_post:
-        app.logger.info('This had started! 3')
+        print 'This had started 3'
         return render_template('oops.html', tags=tags, last_posts=methods.last_posts, top_posts=methods.top_posts())
-    app.logger.info('This had started! 4')
+    print 'This had started 4.5'
     comments = session.query(Comment).filter(Comment.PostTitle == last_post.Title).all()
-    app.logger.info('This had started! 5')
+    app.logger.info('This had started! 4')
     return render_template('post.html', post=last_post, last_posts=methods.last_posts, tags=methods.tags,
                            top_posts=methods.top_posts(), newer_older=True, comments=comments)
 
