@@ -31,7 +31,7 @@ def index():
                     order_by(sqlalchemy.desc(Post.Date)).limit(1).first()
         print 'This had started 2'
     except Exception, e:
-        app.logger.exception(e)
+        print e
     if not last_post:
         return render_template('oops.html', tags=tags, last_posts=methods.last_posts, top_posts=methods.top_posts())
 
