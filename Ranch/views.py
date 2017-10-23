@@ -21,10 +21,7 @@ session = DBSession()
 
 @app.route('/')
 def index():
-    print 'This had started 0'
-    print session
-    print session.query(Post)
-    print 'Maor'
+    print session.query(Post).filter(Post.Primary_Tag != 'System Messages')
     last_post = session.query(Post).filter(Post.Primary_Tag != 'System Messages').\
                 order_by(sqlalchemy.desc(Post.Date)).limit(1).first()
     print 'This had started 2'
