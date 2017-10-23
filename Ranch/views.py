@@ -23,8 +23,8 @@ session = DBSession()
 def index():
     print 'This had started 0'
     print session
-    print dir(session)
-    print 'maor: ' + session.query(Post)
+    print session.query(Post)
+    print 'Maor'
     last_post = session.query(Post).filter(Post.Primary_Tag != 'System Messages').\
                 order_by(sqlalchemy.desc(Post.Date)).limit(1).first()
     print 'This had started 2'
