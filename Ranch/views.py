@@ -21,17 +21,20 @@ session = DBSession()
 
 @app.route('/')
 def index():
-    print session.query(Post).filter(Post.Primary_Tag != 'System Messages').order_by(sqlalchemy.desc(Post.Date)).limit(1)
-    print 'Works until here'
-    last_post = session.query(Post).filter(Post.Primary_Tag != 'System Messages').\
-                order_by(sqlalchemy.desc(Post.Date)).limit(1).first()
-    print 'This had started 2'
+    try:
+        # print dir(session.query(Post).filter(Post.Primary_Tag != 'System Messages').order_by(sqlalchemy.desc(Post.Date)).limit(1))
+        print session.query(Post).filter(Post.Primary_Tag == 'Syjjstem Messages').order_by(sqlalchemy.desc(Post.Date)).limit(1).first()
+        print 'Works until here'
+        last_post = session.query(Post).filter(Post.Primary_Tag != 'System Messages').\
+                    order_by(sqlalchemy.desc(Post.Date)).limit(1).first()
+        print 'This had started 2'
+    except Exception, e:
+        app.logger(e)
     if not last_post:
-        print 'This had started 3'
         return render_template('oops.html', tags=tags, last_posts=methods.last_posts, top_posts=methods.top_posts())
-    print 'This had started 4.5'
+
     comments = session.query(Comment).filter(Comment.PostTitle == last_post.Title).all()
-    app.logger.info('This had started! 4')
+
     return render_template('post.html', post=last_post, last_posts=methods.last_posts, tags=methods.tags,
                            top_posts=methods.top_posts(), newer_older=True, comments=comments)
 
