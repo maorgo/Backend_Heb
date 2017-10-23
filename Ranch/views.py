@@ -21,17 +21,14 @@ session = DBSession()
 
 @app.route('/')
 def index():
-    try:
-        # print dir(session.query(Post).filter(Post.Primary_Tag != 'System Messages').order_by(sqlalchemy.desc(Post.Date)).limit(1))
-        app.logger.info('Starting logging')
-        print 'Starting printing'
-        print session.query(Post).filter(Post.Primary_Tag == 'Syjjstem Messages').order_by(sqlalchemy.desc(Post.Date)).limit(1).first()
-        print 'Works until here'
-        last_post = session.query(Post).filter(Post.Primary_Tag != 'System Messages').\
-                    order_by(sqlalchemy.desc(Post.Date)).limit(1).first()
-        print 'This had started 2'
-    except Exception, e:
-        print e
+    os.environ['FLASK_DEBUG'] = '1'
+    # print dir(session.query(Post).filter(Post.Primary_Tag != 'System Messages').order_by(sqlalchemy.desc(Post.Date)).limit(1))
+    print 'Starting printing'
+    print session.query(Post).filter(Post.Primary_Tag == 'System Messages').order_by(sqlalchemy.desc(Post.Date)).limit(1).first()
+    print 'Works until here'
+    last_post = session.query(Post).filter(Post.Primary_Tag != 'System Messages').\
+                order_by(sqlalchemy.desc(Post.Date)).limit(1).first()
+    print 'This had started 2'
     if not last_post:
         return render_template('oops.html', tags=tags, last_posts=methods.last_posts, top_posts=methods.top_posts())
 
