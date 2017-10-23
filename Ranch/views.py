@@ -24,6 +24,7 @@ def index():
     try:
         # print dir(session.query(Post).filter(Post.Primary_Tag != 'System Messages').order_by(sqlalchemy.desc(Post.Date)).limit(1))
         app.logger.info('Starting logging')
+        print 'Starting printing'
         print session.query(Post).filter(Post.Primary_Tag == 'Syjjstem Messages').order_by(sqlalchemy.desc(Post.Date)).limit(1).first()
         print 'Works until here'
         last_post = session.query(Post).filter(Post.Primary_Tag != 'System Messages').\
